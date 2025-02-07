@@ -35,6 +35,13 @@ const authConfig = {
       }
     })
   ],
+  session: { strategy: "jwt" },
+  callbacks: {
+    async session({ session, token }) {
+      // session.user = { id: token.sub, name: token.name, email: token.email };
+      return session;
+    },
+  },
   pages: {
     signIn: '/' //sigin page
   }
