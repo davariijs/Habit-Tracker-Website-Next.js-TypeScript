@@ -1,50 +1,81 @@
-import { NextAuthConfig } from 'next-auth';
+import type { NextAuthOptions } from "next-auth";
 import CredentialProvider from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
+import GoogleProvider from 'next-auth/providers/google';
+import bcrypt from 'bcryptjs';
+import User from '../models/User';
+import connectMongo from '../utils/db';
 
-const authConfig = {
+
+const authConfig: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    }),
     GithubProvider({
       clientId: process.env.GITHUB_ID ?? '',
       clientSecret: process.env.GITHUB_SECRET ?? ''
     }),
     CredentialProvider({
+      name: 'Credentials',
       credentials: {
-        email: {
-          type: 'email'
-        },
-        password: {
-          type: 'password'
-        }
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials, req) {
-        const user = {
-          id: '1',
-          name: 'John',
-          email: credentials?.email as string
-        };
-        if (user) {
-          // Any object returned will be saved in `user` property of the JWT
-          return user;
-        } else {
-          // If you return null then an error will be displayed advising the user to check their details.
-          return null;
-
-          // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
+        await connectMongo();
+        const { email, password } = credentials ?? {};
+        if (!email || !password) {
+          throw new Error('Invalid email or password.');
         }
-      }
-    })
+
+        // Find user in MongoDB
+        const user = await User.findOne({ email });
+        if (!user) {
+          throw new Error('User not found.');
+        }
+
+        // Validate password using bcrypt
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+          throw new Error('Invalid credentials.');
+        }
+
+        // Return user data
+        return {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+        };
+      },
+    }),
   ],
   session: { strategy: "jwt" },
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+      }
+      return token;
+    },
     async session({ session, token }) {
-      // session.user = { id: token.sub, name: token.name, email: token.email };
+      if (token) {
+        session.user = {
+          id: token.id as string,
+          name: token.name as string,
+          email: token.email as string,
+        };
+      }
       return session;
     },
   },
   pages: {
     signIn: '/' //sigin page
-  }
-} satisfies NextAuthConfig;
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};
 
 export default authConfig;
