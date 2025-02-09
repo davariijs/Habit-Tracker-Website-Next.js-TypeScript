@@ -26,3 +26,4 @@ export default async function Page() {
   }
   return <SignInViewPage stars={stars} />;
 }
+

@@ -13,7 +13,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { signOut, useSession } from 'next-auth/react';
 export function UserNav() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+
+  if (status === 'loading') {
+    return <p>Loading...</p>;
+  }
+
+  if (!session) {
+    return <p>Please sign in.</p>;
+  }
+
+
   if (session) {
     return (
       <DropdownMenu>
@@ -22,7 +33,7 @@ export function UserNav() {
             <Avatar className='h-8 w-8'>
               <AvatarImage
                 src={session.user?.image ?? ''}
-                alt={session.user?.name ?? ''}
+                alt={session.user?.name || 'Guest'}
               />
               <AvatarFallback>{session.user?.name?.[0]}</AvatarFallback>
             </Avatar>

@@ -12,7 +12,14 @@ const authConfig: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-    }),
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code'
+        }
+      }
+        }),
     GithubProvider({
       clientId: process.env.GITHUB_ID ?? '',
       clientSecret: process.env.GITHUB_SECRET ?? ''
@@ -54,6 +61,7 @@ const authConfig: NextAuthOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, user }) {
+      console.log('JWT Callback:', { token, user });
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -62,6 +70,7 @@ const authConfig: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      console.log('Session Callback:', { session, token });
       if (token) {
         session.user = {
           id: token.id as string,
@@ -71,6 +80,10 @@ const authConfig: NextAuthOptions = {
       }
       return session;
     },
+    // async redirect({ url, baseUrl }) {
+    //   console.log('Redirect Callback:', { url, baseUrl });
+    //   return url.startsWith(baseUrl) ? url : baseUrl;
+    // }
   },
   pages: {
     signIn: '/' //sigin page

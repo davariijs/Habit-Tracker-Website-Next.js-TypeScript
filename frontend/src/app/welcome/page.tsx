@@ -2,7 +2,7 @@ import authConfig from '@/lib/auth.config';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 
-export default async function Dashboard() {
+export default async function welcome() {
   try {
     const session = await getServerSession(authConfig);
     console.log('Session:', session); // Log the session to see its structure
@@ -10,10 +10,10 @@ export default async function Dashboard() {
     if (!session?.user) {
       return redirect('/');
     } else {
-      redirect('/dashboard/overview');
+      return <div>welcome</div>;
     }
   } catch (error) {
-    console.error('Dashboard page error:', error);
+    console.error('welcome page error:', error);
     // Handle or log the error appropriately
   }
 }

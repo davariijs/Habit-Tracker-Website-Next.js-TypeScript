@@ -2,16 +2,22 @@
 // https://next-auth.js.org/configuration/nextjs#middleware
 // https://nextjs.org/docs/app/building-your-application/routing/middleware
 
-import NextAuth from 'next-auth';
-import authConfig from '@/lib/auth.config';
+import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import type { NextRequest } from 'next/server';
 
-const { auth } = NextAuth(authConfig);
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req });
 
-export default auth((req) => {
-  if (!req.auth) {
-    const url = req.url.replace(req.nextUrl.pathname, '/');
-    return Response.redirect(url);
+  // If no token, redirect to the homepage
+  if (!token) {
+    const url = req.nextUrl.clone();
+    url.pathname = '/'; // Redirect to homepage
+    return NextResponse.redirect(url);
   }
-});
+
+  // Allow the request if the user is authenticated
+  return NextResponse.next();
+}
 
 export const config = { matcher: ['/dashboard/:path*'] };
