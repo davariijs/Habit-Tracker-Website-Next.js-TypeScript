@@ -10,24 +10,22 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useState} from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import * as z from 'zod';
-import GithubSignInButton from './github-auth-button';
-import GoogleSignInButton from './google-auth-button';
 import { useRouter } from 'next/navigation'; 
+import { signIn } from 'next-auth/react';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  name: z.string().min(1, { message: "Name is required" }),
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
 
-export default function UserAuthForm() {
+export default function UserRegisterForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
   const [loading, setLoading] = useState(false);
@@ -39,6 +37,7 @@ export default function UserAuthForm() {
     defaultValues: {
       email: '',
       password: '',
+      name: '',
     },
   });
 
@@ -47,21 +46,37 @@ export default function UserAuthForm() {
     setError(null);
 
     try {
-      // Use signIn with the 'credentials' provider
-      const result = await signIn('credentials', {
-        redirect: false, // Prevent automatic redirect
-        email: data.email,
-        password: data.password,
-        callbackUrl: '/dashboard' // Redirect to dashboard after successful login
+      const registerResponse = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       });
 
-      if (result?.error) {
-        setError(result.error); // Display the error from NextAuth
+      if (!registerResponse.ok) {
+        const errorData = await registerResponse.json();
+        setError(errorData.message || 'Registration failed.');
+        return; 
+      }
+
+      const registerData = await registerResponse.json();
+
+      
+      const signInResult = await signIn('credentials', {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+        callbackUrl: '/dashboard'
+      });
+
+      if (signInResult?.error) {
+          setError(signInResult.error);
       } else {
-        router.push('/dashboard'); // Redirect manually if successful
+        router.push('/dashboard');
       }
     } catch (err) {
-      console.error("Sign-in error:", err);
+      console.error("Fetch error:", err);
       setError('An unexpected error occurred.');
     } finally {
       setLoading(false);
@@ -75,6 +90,24 @@ export default function UserAuthForm() {
           onSubmit={form.handleSubmit(onSubmit)}
           className='w-full space-y-2'
         >
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter your name..."
+                  disabled={loading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
           <FormField
             control={form.control}
@@ -115,22 +148,10 @@ export default function UserAuthForm() {
           />
           {error && <p className="text-red-500">{error}</p>} {/* Display error message */}
         <Button disabled={loading} className='ml-auto w-full' type='submit'>
-        {loading ? 'Logging in...' : 'Login'}
+        {loading ? 'Registering...' : 'Register'}
         </Button>
         </form>
       </Form>
-      <div className='relative'>
-        <div className='absolute inset-0 flex items-center'>
-          <span className='w-full border-t' />
-        </div>
-        <div className='relative flex justify-center text-xs uppercase'>
-          <span className='bg-background px-2 text-muted-foreground'>
-            Or continue with
-          </span>
-        </div>
-      </div>
-      <GithubSignInButton />
-      <GoogleSignInButton/>
     </>
   );
 }
