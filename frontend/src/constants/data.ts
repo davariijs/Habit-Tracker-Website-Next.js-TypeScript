@@ -30,8 +30,8 @@ export const navItems: NavItem[] = [
     items: [] // No child items
   },
   {
-    title: 'Goals',
-    url: '/dashboard/goals',
+    title: 'Habits',
+    url: '/dashboard/habits',
     icon: 'product',
     shortcut: ['g', 'g'],
     isActive: false,
