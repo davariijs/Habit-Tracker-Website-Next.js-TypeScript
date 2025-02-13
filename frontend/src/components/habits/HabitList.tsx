@@ -15,10 +15,11 @@ import { IHabit } from '@/models/Habit';
 import useSWR from 'swr';
 import { fetcher, updateHabitCompletion, deleteHabit } from '@/lib/habitapi';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import HabitCalendar from './HabitCalendar';
 import { format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import EditIcon from '@mui/icons-material/Edit';
-
+import { useTheme } from 'next-themes';
 
 interface HabitListProps {
   userId: string;
@@ -28,7 +29,7 @@ interface HabitListProps {
 const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
   const { data, error, isLoading, mutate } = useSWR(`/api/habits?userId=${userId}`, fetcher);
   const [visibleCalendar, setVisibleCalendar] = useState<string | null>(null); // Habit ID or null
-
+  const { theme } = useTheme();
   const toggleCalendar = (habitId: string) => {
     setVisibleCalendar((prevId) => (prevId === habitId ? null : habitId));
   };
@@ -102,7 +103,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
       {habits.map((habit) => (
         <React.Fragment key={String(habit._id)}>
         <ListItem  divider>
-          <Box sx={{ width: '100%' , cursor: 'pointer' }} onClick={() => toggleCalendar(String(habit._id))}>
+          <Box sx={{ width: '100%' , cursor: 'pointer'}}>
             <ListItemText
               primary={habit.name}
               secondary={`${habit.question} - ${habit.frequencyType} ${
@@ -116,9 +117,11 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
                     ? `${habit.frequencyValue} times in ${habit.frequencyValue2} days`
                     : '' // Handle other cases or provide a default
                 }`}
-              slotProps={{ primary: { style: { color: habit.color } } }} // Use slotProps
+              slotProps={{ primary: { style: { color: habit.color } },
+              secondary: { style: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)' } }
+             }} // Use slotProps
             />
-            <Box display="flex" alignItems="center" gap={1}>
+            <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
                 {daysOfWeek.map((day) => {
                     const completion = habit.completions.find((c) => isSameDay(c.date, day));
                     const isCompleted = completion ? completion.completed : false;
@@ -150,13 +153,16 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
                 <IconButton edge="end" aria-label="delete" onClick={() => onDeleteHabit(String(habit._id))}>
                     <DeleteIcon />
                 </IconButton>
+
+                <IconButton edge="end" aria-label="calendar" onClick={() => toggleCalendar(String(habit._id))}>
+                  <CalendarMonthIcon />
+                </IconButton>
+              </Box>
             </Box>
-          </Box>
-        </ListItem>
-        {/* Conditionally render the calendar */}
-        <ListItem>
-            <HabitCalendar habit={habit} isVisible={visibleCalendar === String(habit._id)} />
-        </ListItem>
+          </ListItem>
+          <ListItem>
+            <HabitCalendar habit={habit} isVisible={visibleCalendar === String(habit._id)} colorCheck={habit.color}/>
+          </ListItem>
         </React.Fragment>
       ))}
     </List>
