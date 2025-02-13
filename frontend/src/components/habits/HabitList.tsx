@@ -144,17 +144,18 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
                 })}
                 {/* Edit Button */}
                 <IconButton
+                    sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}}
                     edge="end"
                     aria-label="edit"
                     onClick={() => onEditHabit(habit)} // Call onEditHabit
                 >
                   <EditIcon />
                 </IconButton>
-                <IconButton edge="end" aria-label="delete" onClick={() => onDeleteHabit(String(habit._id))}>
+                <IconButton sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}} edge="end" aria-label="delete" onClick={() => onDeleteHabit(String(habit._id))}>
                     <DeleteIcon />
                 </IconButton>
 
-                <IconButton edge="end" aria-label="calendar" onClick={() => toggleCalendar(String(habit._id))}>
+                <IconButton sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}} edge="end" aria-label="calendar" onClick={() => toggleCalendar(String(habit._id))}>
                   <CalendarMonthIcon />
                 </IconButton>
               </Box>

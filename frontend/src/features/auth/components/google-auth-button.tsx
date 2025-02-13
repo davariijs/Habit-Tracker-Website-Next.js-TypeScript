@@ -4,6 +4,8 @@ import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import GoogleIcon from '@mui/icons-material/Google';
+import { IconButton } from '@mui/material';
 
 export default function GoogleSignInButton() {
   const searchParams = useSearchParams();
@@ -18,8 +20,8 @@ export default function GoogleSignInButton() {
         signIn('google', { callbackUrl: callbackUrl ?? '/dashboard' })
       }
     >
-      <Icons.gitHub className='mr-2 h-4 w-4' />
-      Continue with Google
+      <GoogleIcon sx={{width:'16px', height:'16px'}}/>
+      <div className='ml-2'>Continue with Google</div>
     </Button>
   );
 }

@@ -1,9 +1,7 @@
-// components/HabitCalendar.tsx
 "use client";
 
 import React, { useState } from 'react';
-import { Box, Typography, IconButton, Grid } from '@mui/material'; // Use Grid
-import { CheckCircle, Cancel } from '@mui/icons-material';
+import { Box, Typography, IconButton, Grid } from '@mui/material';
 import {
   format,
   isSameDay,
@@ -17,7 +15,7 @@ import { IHabit } from '@/models/Habit';
 
 interface HabitCalendarProps {
   habit: IHabit;
-  isVisible: boolean; // Add isVisible prop
+  isVisible: boolean;
   colorCheck:string;
 }
 
