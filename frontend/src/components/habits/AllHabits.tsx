@@ -2,13 +2,18 @@
 import React, { useState } from 'react';
 import HabitForm from './HabitForm';
 import HabitList from './HabitList';
-import { Container, Typography, Box, Button } from '@mui/material';
+import { Container, Typography, Box} from '@mui/material';
 import { createHabit,updateHabit } from '@/lib/habitapi'; // Import from api.ts
 import useSWR from 'swr';
 import { HabitFormData } from './HabitForm';
 import { useSession } from 'next-auth/react';
 import { IHabit } from '@/models/Habit';
-
+import PageContainer from '../layout/page-container';
+import { Heading } from '@/components/ui/heading';
+import { buttonVariants } from '../ui/button';
+import { cn } from '@/lib/utils';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 const AllHabits: React.FC = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingHabit, setEditingHabit] = useState<IHabit | null>(null); // State for tracking the habit being edited
@@ -53,31 +58,43 @@ const AllHabits: React.FC = () => {
     };
   
     return (
-      <Container maxWidth="md">
-        <Typography variant="h4" component="h1" gutterBottom>
-          Habit Tracker
-        </Typography>
-        <Box sx={{ mb: 2 }}>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setShowForm(!showForm);
-              setEditingHabit(null); // Reset editing state for "create habit"
-            }}
-          >
-            {showForm ? 'Hide Form' : 'Add Habit'}
-          </Button>
-        </Box>
-  
-        {showForm && (
-          <HabitForm
-            onSubmit={editingHabit ? handleUpdateHabit : handleCreateHabit} // Different handler for create vs update
-            initialData={editingHabit} // Pass the habit being edited (or null for create)
-            userId={userId}
-          />
-        )}
-        <HabitList userId={userId} onEditHabit={handleEditHabit} /> {/* Pass handleEditHabit */}
-      </Container>
+      <PageContainer scrollable={false}>
+        <div className='flex flex-1 flex-col space-y-4'>
+          <div className='flex items-start justify-between'>
+          <div>
+            <Heading
+              title='Habit Tracker'
+              description=''
+            />
+          </div>
+          
+          <div>
+          <Box>
+            <Button
+              variant='default' size='lg'
+              className=''
+              onClick={() => {
+                setShowForm(!showForm);
+                setEditingHabit(null); // Reset editing state for "create habit"
+              }}
+            >
+              <Plus className='mr-2 h-4 w-4' />
+              {showForm ? 'Hide Form' : 'Add Habit'}
+            </Button>
+          </Box>
+          </div>
+          </div>
+    
+          {showForm && (
+            <HabitForm
+              onSubmit={editingHabit ? handleUpdateHabit : handleCreateHabit} // Different handler for create vs update
+              initialData={editingHabit} // Pass the habit being edited (or null for create)
+              userId={userId}
+            />
+          )}
+          <HabitList userId={userId} onEditHabit={handleEditHabit} /> {/* Pass handleEditHabit */}
+        </div>
+        </PageContainer>
     );
   };
 
