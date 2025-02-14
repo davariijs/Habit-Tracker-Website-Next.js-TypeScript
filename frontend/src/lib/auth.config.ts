@@ -15,7 +15,6 @@ const authConfig: NextAuthOptions = {
       authorization: {
         params: {
           prompt: 'consent',
-          access_type: 'offline',
           response_type: 'code'
         }
       }
@@ -60,13 +59,17 @@ const authConfig: NextAuthOptions = {
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, user }) {
-      console.log('JWT Callback:', { token, user });
+    async jwt({ token, user, account, profile }) {
+      console.log('JWT Callback:', { token, user, account, profile });
       if (user) {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
       }
+      if (account) {
+        console.log("Account:", account);
+      }
+      console.log("Token:", token);
       return token;
     },
     async session({ session, token }) {
@@ -80,15 +83,49 @@ const authConfig: NextAuthOptions = {
       }
       return session;
     },
-    // async redirect({ url, baseUrl }) {
-    //   console.log('Redirect Callback:', { url, baseUrl });
-    //   return url.startsWith(baseUrl) ? url : baseUrl;
-    // }
+    async signIn({ user, account }) {
+      if (account?.provider === 'google') {
+        await connectMongo();
+  
+        // Check if user already exists
+        let existingUser = await User.findOne({ email: user.email });
+  
+        // If not, create a new user
+        if (!existingUser) {
+          existingUser = await User.create({
+            name: user.name,
+            email: user.email,
+            password: null, // Google users don't have a password
+          });
+        }
+  
+        return true;
+      }
+      if (account?.provider === 'github') {
+        await connectMongo();
+  
+        // Check if user already exists
+        let existingUser = await User.findOne({ email: user.email });
+  
+        // If not, create a new user
+        if (!existingUser) {
+          existingUser = await User.create({
+            name: user.name,
+            email: user.email,
+            password: null
+          });
+        }
+  
+        return true;
+      }
+      return true;
+    }
   },
   pages: {
     signIn: '/' //sigin page
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: true
 };
 
 export default authConfig;
