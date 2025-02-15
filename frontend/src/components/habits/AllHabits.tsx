@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import HabitForm from './HabitForm';
 import HabitList from './HabitList';
-import { Container, Typography, Box} from '@mui/material';
+import {Box} from '@mui/material';
 import { createHabit,updateHabit } from '@/lib/habitapi'; // Import from api.ts
 import useSWR from 'swr';
 import { HabitFormData } from './HabitForm';
@@ -10,8 +10,6 @@ import { useSession } from 'next-auth/react';
 import { IHabit } from '@/models/Habit';
 import PageContainer from '../layout/page-container';
 import { Heading } from '@/components/ui/heading';
-import { buttonVariants } from '../ui/button';
-import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 const AllHabits: React.FC = () => {

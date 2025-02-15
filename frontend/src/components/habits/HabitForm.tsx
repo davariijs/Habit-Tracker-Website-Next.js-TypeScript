@@ -3,15 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import {
   TextField,
-  Button,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Box,
-  FormHelperText,
 } from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { IHabit } from '@/models/Habit';
+import { useTheme } from 'next-themes';
 
 export interface HabitFormData {
   userId: string;
@@ -42,7 +42,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId }) 
   const [frequencyValue2, setFrequencyValue2] = useState<number | undefined>(undefined);
   const [reminderTime, setReminderTime] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const { theme } = useTheme();
   
   // Use useEffect to update form state when initialData changes
   useEffect(() => {
@@ -103,7 +103,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId }) 
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)', mt: 1}} >
       <TextField
         margin="normal"
         required
@@ -224,8 +224,9 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId }) 
         onChange={(e) => setReminderTime(e.target.value)}
         placeholder="e.g., 19:00"
       />
-      <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-        {initialData ? 'Update Habit' : 'Create Habit'} {/* Change button label */}
+      <Button type="submit" variant='default' className='w-full mt-2' size='lg'
+      >
+        {initialData ? 'Update Habit' : 'Create Habit'}
       </Button>
     </Box>
   );
