@@ -1,3 +1,4 @@
+import NotificationHandler from '@/components/notification/NotificationHandler';
 import authConfig from '@/lib/auth.config';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
@@ -9,10 +10,7 @@ export default async function Dashboard() {
 
     if (!session?.user) {
       return redirect('/');
-    } 
-    // else {
-    //   redirect('/dashboard/overview');
-    // }
+    }
   } catch (error) {
     console.error('Dashboard page error:', error);
   } finally {
@@ -22,3 +20,5 @@ export default async function Dashboard() {
     }
   }
 }
+
+// curl -X POST http://localhost:3000/api/notification/start-scheduler
