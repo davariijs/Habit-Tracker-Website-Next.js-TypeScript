@@ -5,6 +5,7 @@ import { Breadcrumbs } from '../breadcrumbs';
 import SearchInput from '../search-input';
 import { UserNav } from './user-nav';
 import ThemeToggle from './ThemeToggle/theme-toggle';
+import NotificationHandler from '../notification/NotificationHandler';
 
 export default function Header() {
   return (
@@ -13,6 +14,7 @@ export default function Header() {
         <SidebarTrigger className='-ml-1' />
         <Separator orientation='vertical' className='mr-2 h-4' />
         <Breadcrumbs />
+        <NotificationHandler/>
       </div>
 
       <div className='flex items-center gap-2 px-4'>
