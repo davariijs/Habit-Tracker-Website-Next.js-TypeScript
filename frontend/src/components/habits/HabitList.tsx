@@ -98,6 +98,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
     const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
     const daysOfWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
+
   return (
     <List>
       {habits.map((habit) => (
