@@ -12,10 +12,13 @@ export default function NotificationHandler() {
   }, []);
 
   useEffect(() => {
-    if (session?.user.id) {
-      // ✅ Subscribe to push notifications only after login
-      subscribeToPushNotifications(session?.user.id);
-    }
+    if (!session?.user?.email) {
+        console.error("❌ Cannot subscribe to push notifications: email is undefined");
+        return;
+      }
+    
+      console.log("📌 Subscribing user to push notifications:", session.user.email);
+      subscribeToPushNotifications(session.user.email);
   }, [session?.user.id]);
 
   return null; // This component doesn't render anything
