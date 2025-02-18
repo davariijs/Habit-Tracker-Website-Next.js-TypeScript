@@ -1,28 +1,39 @@
 import { NextResponse } from "next/server";
 import connectMongo from "@/utils/db";
 import User from "@/models/User";
-import { isValidObjectId, ObjectId } from "mongoose";
+import mongoose from "mongoose";
 
 export async function POST(req: Request) {
   try {
     await connectMongo(); // Connect to MongoDB
 
-    const { subscription, userId } = await req.json();
+    console.log("📝 Incoming request:", req);
 
-    if (!subscription || !userId) {
-      return NextResponse.json({ message: "Missing subscription or userId" }, { status: 400 });
+    const body = await req.json();
+    console.log("📌 Parsed body:", body);
+
+    const { subscription, email  } = body;
+    console.log("📌 Received subscription request:", { email, subscription });
+
+    if (!subscription || !email) {
+      return NextResponse.json({ message: "Missing subscription or email" }, { status: 400 });
     }
 
-    // if (!isValidObjectId(userId)) {
-    //   return NextResponse.json({ message: "Invalid userId" }, { status: 400 });
-    // }
 
+    const user = await User.findOneAndUpdate(
+      { email: email }, 
+      { pushSubscription: subscription }, 
+      { new: true }
+    );
 
-    // Save subscription in the database
-    await User.findByIdAndUpdate(userId, { pushSubscription: subscription });
+    if (!user) {
+      console.error("❌ No user found with email:", email);
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
 
     return NextResponse.json({ message: "✅ Subscription saved successfully!" });
   } catch (error) {
+    console.error("❌ Error parsing request:", error);
     return NextResponse.json({ message: "❌ Error saving subscription", error }, { status: 500 });
   }
 }
