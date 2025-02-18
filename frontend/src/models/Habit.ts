@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IHabit extends Document {
-  userId: string; // Add userId
+  userId: mongoose.Schema.Types.ObjectId;
+  userEmail:string;
   name: string;
   color: string;
   question: string;
@@ -14,7 +15,8 @@ export interface IHabit extends Document {
 }
 
 const HabitSchema: Schema = new Schema({
-  userId: { type: String, required: true }, // Add userId field
+  userId: { type: String, required: true },
+  userEmail: { type: String, required: true }, // Add userId field
   name: { type: String, required: true },
   color: { type: String, required: true },
   question: { type: String, required: true },
