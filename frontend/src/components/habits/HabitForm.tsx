@@ -12,9 +12,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { IHabit } from '@/models/Habit';
 import { useTheme } from 'next-themes';
+import { useSession } from "next-auth/react";
 
 export interface HabitFormData {
   userId: string;
+  userEmail:string;
   name: string;
   color: string;
   question: string;
@@ -33,7 +35,10 @@ interface HabitFormProps {
 }
 
 const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId }) => {
-
+  const { data: session } = useSession();
+  const userEmailForm = session?.user?.email ?? "";
+  const userEmail:string = userEmailForm;
+  console.log(userEmail);
   const [name, setName] = useState('');
   const [color, setColor] = useState('#007bff');
   const [question, setQuestion] = useState('');
@@ -88,6 +93,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId }) 
 
     const habitData: HabitFormData = {
       userId,
+      userEmail,
       name,
       color,
       question,
