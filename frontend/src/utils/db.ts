@@ -1,4 +1,3 @@
-// lib/mongodb.ts
 import mongoose from "mongoose";
 
 const MONGO_URI = process.env.MONGO_URI as string;
@@ -11,11 +10,6 @@ interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
 }
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
- */
 let cached = (global as any).mongoose as MongooseCache | undefined;
 
 if (!cached) {
