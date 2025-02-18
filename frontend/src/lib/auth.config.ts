@@ -6,7 +6,6 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User';
 import connectMongo from '../utils/db';
 
-
 const authConfig: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -21,7 +20,11 @@ const authConfig: NextAuthOptions = {
         }),
     GithubProvider({
       clientId: process.env.GITHUB_ID ?? '',
-      clientSecret: process.env.GITHUB_SECRET ?? ''
+      clientSecret: process.env.GITHUB_SECRET ?? '',
+      httpOptions: {
+        timeout: 10000, // Optional: Increase timeout if needed
+        agent: undefined, // Explicitly disable the proxy agent
+      },
     }),
     CredentialProvider({
       name: 'Credentials',
@@ -38,6 +41,7 @@ const authConfig: NextAuthOptions = {
 
         // Find user in MongoDB
         const user = await User.findOne({ email });
+        // const user = await User.findOne({ email: credentials.email });
         if (!user) {
           throw new Error('User not found.');
         }
@@ -50,7 +54,8 @@ const authConfig: NextAuthOptions = {
 
         // Return user data
         return {
-          id: user._id.toString(),
+          // id: user._id.toString(),
+          id: user._id,
           name: user.name,
           email: user.email,
         };
@@ -66,15 +71,15 @@ const authConfig: NextAuthOptions = {
         token.name = user.name;
         token.email = user.email;
       }
-      if (account) {
-        console.log("Account:", account);
-      }
-      console.log("Token:", token);
+      // if (account) {
+      //   console.log("Account:", account);
+      // }
+      // console.log("Token:", token);
       return token;
     },
     async session({ session, token }) {
-      console.log('Session Callback:', { session, token });
-      if (token) {
+      // console.log('Session Callback:', { session, token });
+      if (token && token.id) {
         session.user = {
           id: token.id as string,
           name: token.name as string,
@@ -84,7 +89,7 @@ const authConfig: NextAuthOptions = {
       return session;
     },
     async signIn({ user, account }) {
-      if (account?.provider === 'google') {
+      if (account?.provider === 'google' || account?.provider === 'github') {
         await connectMongo();
   
         // Check if user already exists
@@ -96,23 +101,6 @@ const authConfig: NextAuthOptions = {
             name: user.name,
             email: user.email,
             password: null, // Google users don't have a password
-          });
-        }
-  
-        return true;
-      }
-      if (account?.provider === 'github') {
-        await connectMongo();
-  
-        // Check if user already exists
-        let existingUser = await User.findOne({ email: user.email });
-  
-        // If not, create a new user
-        if (!existingUser) {
-          existingUser = await User.create({
-            name: user.name,
-            email: user.email,
-            password: null
           });
         }
   
