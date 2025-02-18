@@ -6,7 +6,7 @@ export const scheduleNotifications = async () => {
   const habits = await HabitModel.find({ reminderTime: { $exists: true, $ne: null } });
 
   habits.forEach((habit) => {
-    const { reminderTime, _id, name, userId,question } = habit;
+    const { reminderTime, _id, name, userEmail,question } = habit;
 
     if (reminderTime) {
       const reminderDate = new Date(reminderTime);
@@ -16,7 +16,7 @@ export const scheduleNotifications = async () => {
 
       schedule.scheduleJob(habitId.toString(), reminderDate, async () => {
         console.log(`⏰ Sending notification for habit: ${name}`);
-        await sendPushNotification(userId, name, question);
+        await sendPushNotification(userEmail, name, question);
       });
     }
   }
