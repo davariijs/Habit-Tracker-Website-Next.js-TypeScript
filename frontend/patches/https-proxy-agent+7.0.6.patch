@@ -1,0 +1,14 @@
+diff --git a/node_modules/https-proxy-agent/dist/index.js b/node_modules/https-proxy-agent/dist/index.js
+index 1857f46..aa7451c 100644
+--- a/node_modules/https-proxy-agent/dist/index.js
++++ b/node_modules/https-proxy-agent/dist/index.js
+@@ -28,7 +28,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.HttpsProxyAgent = void 0;
+ const net = __importStar(require("net"));
+-const tls = __importStar(require("tls"));
++// const tls = __importStar(require("tls"));
++const tls = null;
+ const assert_1 = __importDefault(require("assert"));
+ const debug_1 = __importDefault(require("debug"));
+ const agent_base_1 = require("agent-base");
