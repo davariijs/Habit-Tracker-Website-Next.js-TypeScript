@@ -20,6 +20,7 @@ import HabitCalendar from './HabitCalendar';
 import { format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import EditIcon from '@mui/icons-material/Edit';
 import { useTheme } from 'next-themes';
+import Link from 'next/link';
 
 interface HabitListProps {
   userId: string;
@@ -159,6 +160,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
                 <IconButton sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}} edge="end" aria-label="calendar" onClick={() => toggleCalendar(String(habit._id))}>
                   <CalendarMonthIcon />
                 </IconButton>
+                <Link href={`/dashboard/habits/${String(habit._id)}`}>Habit</Link>
               </Box>
             </Box>
           </ListItem>
