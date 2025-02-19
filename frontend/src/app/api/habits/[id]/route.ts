@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectMongo from '@/utils/db';
 import HabitModel, { IHabit } from '@/models/Habit';
+import mongoose from 'mongoose';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -29,4 +30,23 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-// You could also add a GET route here to fetch a single habit by ID if needed
+
+export async function GET(req: Request, { params }: { params: { habitId: string } }) {
+  await connectMongo();
+  const { habitId } = params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(habitId)) {
+      return NextResponse.json({ message: 'Invalid habit ID' }, { status: 400 });
+    }
+
+    const habit = await HabitModel.findById(new mongoose.Types.ObjectId(habitId));
+    if (!habit) {
+      return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(habit);
+  } catch (error) {
+    return NextResponse.json({ message: 'Server error', error }, { status: 500 });
+  }
+}
