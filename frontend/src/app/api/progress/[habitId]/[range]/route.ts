@@ -1,74 +1,98 @@
+// app/api/progress/[habitId]/[range]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import  connectMongo  from '@/utils/db'; // Assuming you have a db connection utility
+import HabitModel from '@/models/Habit'; // Assuming you have a Habit model
 import mongoose from 'mongoose';
-import connectMongo from '@/utils/db';
-import HabitModel from '@/models/Habit';
+import { format, startOfDay, startOfWeek, startOfMonth, startOfYear, endOfDay, endOfWeek, endOfMonth, endOfYear, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, eachYearOfInterval, isSameDay, isSameWeek, isSameMonth, isSameYear, getDaysInMonth } from 'date-fns';
 
+interface Completion {
+  date: string;
+  completed: boolean;
+}
+
+interface Habit {
+  _id: string;
+  completions: Completion[];
+  // ... other habit fields
+}
 export async function GET(req: NextRequest, { params }: { params: { habitId: string; range: string } }) {
   await connectMongo();
   const { habitId, range } = params;
 
   try {
-    // Convert habitId from string to ObjectId
     if (!mongoose.Types.ObjectId.isValid(habitId)) {
       return NextResponse.json({ message: 'Invalid habit ID' }, { status: 400 });
     }
 
-    const habit = await HabitModel.findById(new mongoose.Types.ObjectId(habitId));
-    
+    const habit = await HabitModel.findById(new mongoose.Types.ObjectId(habitId)) as unknown as Habit;
+
     if (!habit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
 
     const now = new Date();
     let startDate: Date;
+    let endDate: Date = endOfDay(now); // Important: Include the current day
+    let interval: Date[] = []; 
 
     switch (range) {
       case 'day':
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        startDate = startOfDay(now);
+        interval = eachDayOfInterval({ start: startDate, end: endDate });
         break;
       case 'week':
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - now.getDay());
+        startDate = startOfWeek(now, { weekStartsOn: 0 }); // Or 1, depending on your preference
+        endDate = endOfWeek(now, { weekStartsOn: 0 });
+        interval = eachDayOfInterval({ start: startDate, end: endDate });
         break;
       case 'month':
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        startDate = startOfMonth(now);
+        endDate = endOfMonth(now);
+        interval = eachDayOfInterval({ start: startDate, end: endDate });
         break;
       case 'year':
-        startDate = new Date(now.getFullYear(), 0, 1);
+        startDate = startOfYear(now);
+        endDate = endOfYear(now);
+        interval = eachMonthOfInterval({ start: startDate, end: endDate });
         break;
       default:
         return NextResponse.json({ message: 'Invalid range' }, { status: 400 });
     }
 
-    const completions = habit.completions.filter((c) => new Date(c.date) >= startDate);
-    const completedCount = completions.filter((c) => c.completed).length;
-    const totalDays = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
-    const completionRate = totalDays > 0 ? (completedCount / totalDays) * 100 : 0;
+    const historyData = interval.map(date => {
+      const dateStart = (range === 'year') ? startOfMonth(date) : startOfDay(date); //start of month for year range
+      const dateEnd = (range === 'year') ? endOfMonth(date) : endOfDay(date);     //end of month for year range
+      const completionsInInterval = habit.completions.filter(c => {
+        const completionDate = new Date(c.date);
+        return completionDate >= dateStart && completionDate <= dateEnd && c.completed;
+      });
 
-    let historyData: { time: string; completed: number }[] = [];
-    if (range === 'week') {
-      historyData = Array(7).fill(0).map((_, i) => ({
-        time: `Day ${i + 1}`,
-        completed: completions.filter((c) => new Date(c.date).getDay() === i).length,
-      }));
-    } else if (range === 'month') {
-      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-      historyData = Array(daysInMonth).fill(0).map((_, i) => ({
-        time: `Day ${i + 1}`,
-        completed: completions.filter((c) => new Date(c.date).getDate() === i + 1).length,
-      }));
-    } else if (range === 'year') {
-      historyData = Array(12).fill(0).map((_, i) => ({
-        time: `Month ${i + 1}`,
-        completed: completions.filter((c) => new Date(c.date).getMonth() === i).length,
-      }));
-    }
+      let xLabel = '';
+      if (range === 'day' || range === 'week' || range === 'month') {
+          xLabel = format(dateStart, 'yyyy-MM-dd');
+      } else { // Year
+          xLabel = format(dateStart, 'MMM'); // Format as "Jan", "Feb", etc.
+      }
+
+      return {
+        time: xLabel,
+        completed: completionsInInterval.length,
+      };
+    });
+
+    // Calculate overall completion rate (for the Line Chart, if needed)
+    const completedCount = habit.completions.filter(c => new Date(c.date) >= startDate && new Date(c.date) <= endDate && c.completed).length;
+    const totalPossibleDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1; // +1 to include start date
+    const completionRate = totalPossibleDays > 0 ? (completedCount / totalPossibleDays) * 100 : 0;
+
 
     return NextResponse.json({
-      score: completionRate.toFixed(2),
+      score: completionRate.toFixed(2), // For overall display (optional)
       history: historyData,
-    });
+    }, { status: 200 });
+
   } catch (error) {
+    console.error("Error fetching progress:", error);
     return NextResponse.json({ message: 'Server error', error }, { status: 500 });
   }
 }
