@@ -6,10 +6,10 @@ import HabitScoreChart from './HabitScoreChart';
 
 interface HabitDetailProps {
   habitId: string;
+  habitColor: string;
 }
 
-const HabitCharts: React.FC<HabitDetailProps> = ({ habitId }) => {
-    console.log(habitId);
+const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor}) => {
   const [habit, setHabit] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<'day' | 'week' | 'month' | 'year'>('week');
@@ -46,8 +46,8 @@ const HabitCharts: React.FC<HabitDetailProps> = ({ habitId }) => {
         <option value="year">Year</option>
       </select>
 
-      <HabitScoreChart habitId={habitId} range={range} />
-      {range !== 'day' && <HabitHistoryChart habitId={habitId} range={range as 'week' | 'month' | 'year'} />}
+      <HabitScoreChart habitId={habitId} range={range} habitColor={habitColor}/>
+      {range !== 'day' && <HabitHistoryChart habitId={habitId} range={range as 'week' | 'month' | 'year'} habitColor={habitColor}/>}
     </div>
   );
 };

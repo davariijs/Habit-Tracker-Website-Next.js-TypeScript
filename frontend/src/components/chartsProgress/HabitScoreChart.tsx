@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 
 interface HabitScoreChartProps {
   habitId: string;
+  habitColor: string;
   range: 'day' | 'week' | 'month' | 'year';
 }
 
@@ -18,7 +19,7 @@ interface PercentageData {
   score: number;
 }
 
-const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range }) => {
+const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range,habitColor }) => {
   const [data, setData] = useState<PercentageData[]>([]);
 
   useEffect(() => {
@@ -48,7 +49,7 @@ const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range }) => 
           <XAxis dataKey="time" />
           <YAxis domain={[0, 100]} tickFormatter={(tick) => `${tick}%`} />
           <Tooltip />
-          <Line type="monotone" dataKey="score" stroke="#8884d8" name="Completion %" />
+          <Line type="monotone" dataKey="score" stroke={habitColor} name="Completion %" />
         </LineChart>
       </ResponsiveContainer>
     </div>

@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContaine
 
 interface HabitHistoryChartProps {
   habitId: string;
+  habitColor: string;
   range: 'week' | 'month' | 'year';
 }
 
@@ -13,7 +14,7 @@ interface ChartData {
   completed: number;
 }
 
-const HabitHistoryChart: React.FC<HabitHistoryChartProps> = ({ habitId, range }) => {
+const HabitHistoryChart: React.FC<HabitHistoryChartProps> = ({ habitId, range,habitColor}) => {
   const [data, setData] = useState<ChartData[]>([]);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ const HabitHistoryChart: React.FC<HabitHistoryChartProps> = ({ habitId, range })
           <XAxis dataKey="time" />
           <YAxis />
           <Tooltip />
-          <Bar dataKey="completed" fill="#82ca9d" name="Completions" />
+          <Bar dataKey="completed" fill={habitColor} name="Completions" />
         </BarChart>
       </ResponsiveContainer>
     </div>
