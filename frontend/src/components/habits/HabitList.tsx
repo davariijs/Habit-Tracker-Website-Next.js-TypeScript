@@ -160,7 +160,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
                 <IconButton sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}} edge="end" aria-label="calendar" onClick={() => toggleCalendar(String(habit._id))}>
                   <CalendarMonthIcon />
                 </IconButton>
-                <Link href={`/dashboard/habits/${String(habit._id)}`}>Habit</Link>
+                <Link href={`/dashboard/habits/${habit._id}?color=${encodeURIComponent(habit.color)}`}>Habit</Link>
               </Box>
             </Box>
           </ListItem>
