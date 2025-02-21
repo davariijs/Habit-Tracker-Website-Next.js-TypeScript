@@ -50,11 +50,6 @@ const AllHabits: React.FC = () => {
       setShowForm(true); // Show the form
     };
   
-    const handleFormClose = () => {
-      setShowForm(false);
-      setEditingHabit(null); // Reset editing state when closing the form
-    };
-  
     return (
       <PageContainer scrollable={false}>
         <div className='flex flex-1 flex-col space-y-4'>
