@@ -21,7 +21,6 @@ const HabitPage = ({ params, searchParams }: HabitPageProps) => {
 
   return (
     <div>
-      <h2>Habit Progress</h2>
       <Suspense fallback={<p>Loading...</p>}>
         <HabitCharts habitId={params.habitId} habitColor={habitColor}/>
       </Suspense>
