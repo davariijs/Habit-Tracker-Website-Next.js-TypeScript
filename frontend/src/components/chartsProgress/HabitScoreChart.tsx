@@ -19,7 +19,41 @@ interface PercentageData {
   score: number;
 }
 
-const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range,habitColor }) => {
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip
+} from '@/components/ui/chart';
+
+export const description = 'An interactive bar chart';
+
+const chartConfig = {
+  views: {
+    label: 'Page Views'
+  },
+  desktop: {
+    label: 'Desktop',
+    color: 'hsl(var(--chart-1))'
+  },
+  mobile: {
+    label: 'Mobile',
+    color: 'hsl(var(--chart-2))'
+  },
+  error: {
+    label: 'Error',
+    color: 'hsl(var(--chart-2))'
+  }
+} satisfies ChartConfig;
+
+
+const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range,habitColor}) => {
   const [data, setData] = useState<PercentageData[]>([]);
 
   useEffect(() => {
@@ -41,19 +75,44 @@ const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range,habitC
   }, [habitId, range]);
 
   return (
-    <div>
-      <h3>Completion %</h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="time" />
-          <YAxis domain={[0, 100]} tickFormatter={(tick) => `${tick}%`} />
-          <Tooltip />
-          <Line type="monotone" dataKey="score" stroke={habitColor} name="Completion %" />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+    <Card>
+      <CardHeader className='flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row'>
+        <div className='flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6'>
+          <CardTitle>Score</CardTitle>
+          <CardDescription>
+          </CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className='px-2 sm:p-6'>
+        <ChartContainer
+          config={chartConfig}
+          className='aspect-auto h-[280px] w-full'
+        >
+          <LineChart
+            accessibilityLayer
+            data={data}
+            margin={{
+              left: 12,
+              right: 12
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="time"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={32}
+            />
+            <YAxis domain={[0, 100]} tickFormatter={(tick) => `${tick}%`}/>
+            <ChartTooltip
+            />
+            <Line type="monotone" dataKey="score" stroke={habitColor} name="Completion %"  />
+          </LineChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
-};
+}
 
 export default HabitScoreChart;
