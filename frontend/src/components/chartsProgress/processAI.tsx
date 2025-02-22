@@ -1,20 +1,20 @@
 "use client";
 
 interface HabitTitleProps {
-    habitTitle: string;
-  }
+    habitId: string; // Add habitId prop
+    range: 'week' | 'month' | 'year'; // Add range prop
+}
 
 import React, { useState } from "react";
 
-const ProcessAI: React.FC<HabitTitleProps> = ({habitTitle}) => {
-    console.log(habitTitle);
+const ProcessAI: React.FC<HabitTitleProps> = ({ habitId, range }) => { // Use habitId and range
   const [suggestion, setSuggestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerateSuggestion = async () => {
-    if (!habitTitle.trim()) {
-      setError("Please enter a habit or goal description.");
+    if (!habitId) { // Check for habitId, not habitTitle
+      setError("No habit selected.");
       return;
     }
 
@@ -25,15 +25,18 @@ const ProcessAI: React.FC<HabitTitleProps> = ({habitTitle}) => {
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: `Suggest how to improve this goal or habit: ${habitTitle}` }),
+        body: JSON.stringify({ habitId, range }), // Send habitId and range
       });
 
-      if (!res.ok) throw new Error("Failed to fetch AI suggestion");
+      if (!res.ok) {
+          const errorData = await res.json(); // Attempt to get error message
+          throw new Error(errorData.error || "Failed to fetch AI suggestion");
+      }
 
       const data = await res.json();
       setSuggestion(data.suggestion || "No suggestion available.");
-    } catch (err) {
-      setError("Error fetching suggestion. Please try again.");
+    } catch (err: any) { // Use 'any' type for error
+      setError(err.message || "Error fetching suggestion. Please try again."); // Access err.message
     } finally {
       setLoading(false);
     }

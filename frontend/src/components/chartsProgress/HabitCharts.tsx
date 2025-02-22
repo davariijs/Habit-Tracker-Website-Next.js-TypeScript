@@ -79,7 +79,7 @@ const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor,habitTitle
                 </SelectContent>
               </Select>
         </div>
-      <ProcessAI habitTitle={habitTitle}/>
+        {range !== 'day' && <ProcessAI habitId={habitId} range={range} />}
       <HabitScoreChart habitId={habitId} range={range} habitColor={habitColor}/>
       {range !== 'day' && <HabitHistoryChart habitId={habitId} range={range as 'week' | 'month' | 'year'} habitColor={habitColor}/>}
     </div>
