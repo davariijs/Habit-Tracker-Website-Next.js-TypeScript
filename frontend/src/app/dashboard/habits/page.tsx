@@ -1,5 +1,6 @@
 import { SearchParams } from 'nuqs/server';
 import AllHabits from '@/components/habits/AllHabits';
+import PageContainer from '@/components/layout/page-container';
 
 type pageProps = {
   searchParams: Promise<SearchParams>;
@@ -10,5 +11,9 @@ export const metadata = {
 };
 
 export default async function Page({ searchParams }: pageProps) {
-  return <AllHabits />;
+  return (
+  <PageContainer scrollable>
+  <AllHabits />
+  </PageContainer>
+  )
 }
