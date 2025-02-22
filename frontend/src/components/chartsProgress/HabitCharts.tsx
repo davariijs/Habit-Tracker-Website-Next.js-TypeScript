@@ -11,14 +11,17 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import ProcessAI from './processAI';
+import PageContainer from '../layout/page-container';
 
 
 interface HabitDetailProps {
   habitId: string;
   habitColor: string;
+  habitTitle: string;
 }
 
-const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor}) => {
+const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor,habitTitle}) => {
   const [habit, setHabit] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<'day' | 'week' | 'month' | 'year'>('week');
@@ -47,6 +50,7 @@ const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor}) => {
   if (!habit) return <p>Habit not found</p>;
 
   return (
+    <PageContainer scrollable>
     <div className='flex flex-1 flex-col space-y-5 px-6'>
       <div className='flex items-start justify-between py-3'>
             <Heading
@@ -75,10 +79,11 @@ const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor}) => {
                 </SelectContent>
               </Select>
         </div>
-
+      <ProcessAI habitTitle={habitTitle}/>
       <HabitScoreChart habitId={habitId} range={range} habitColor={habitColor}/>
       {range !== 'day' && <HabitHistoryChart habitId={habitId} range={range as 'week' | 'month' | 'year'} habitColor={habitColor}/>}
     </div>
+    </PageContainer>
   );
 };
 
