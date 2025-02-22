@@ -60,14 +60,26 @@ const ProcessAI: React.FC<HabitTitleProps> = ({ habitId, range }) => { // Use ha
 
 const FormattedSuggestion: React.FC<{ text: string }> = ({ text }) => {
     const sections = text.split("\n").filter((line) => line.trim() !== "");
-  
+
     return (
       <div className="mt-6 bg-gray-50 p-4 rounded-lg border">
         <h3 className="text-lg font-semibold text-gray-700">🧠 AI Suggestions</h3>
         <div className="mt-2 space-y-3">
           {sections.map((line, index) => {
-            if (/^\*\*.*\*\*$/.test(line)) {
-              // Format headings like **Specific**
+            if (line.startsWith("**") && line.includes(":** ")) { // Changed split delimiter to "**: "
+              const parts = line.split(":** "); // Changed split delimiter to "**: "
+              const headingText = parts[0].replace(/\*\*/g, "").trim();
+              const paragraphText = parts[1]?.trim();
+              return (
+                <div key={index}>
+                  <h4 className="text-md font-bold text-blue-600 mt-4">
+                    {headingText}
+                  </h4>
+                  {paragraphText && <p className="text-gray-700">{paragraphText}</p>}
+                </div>
+              );
+            } else if (/^\*\*.*\*\*$/.test(line)) {
+              // Format headings like **Specific** (if still needed)
               return (
                 <h4 key={index} className="text-md font-bold text-blue-600 mt-4">
                   {line.replace(/\*\*/g, "")}
