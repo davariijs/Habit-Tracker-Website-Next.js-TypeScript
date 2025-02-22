@@ -1,4 +1,3 @@
-// app/api/ai/route.ts (Continuing from the previous, fully corrected version)
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import connectMongo from "@/utils/db";
