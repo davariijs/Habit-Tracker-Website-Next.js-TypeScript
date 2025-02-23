@@ -5,12 +5,42 @@ interface HabitTitleProps {
     range: 'week' | 'month' | 'year'; // Add range prop
 }
 
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
+import * as tf from "@tensorflow/tfjs";
+import '@tensorflow/tfjs-backend-webgl'; // Import the WebGL backend!
+// Import a pre-trained sentiment analysis model (e.g., from tfhub.dev)
+import * as use from "@tensorflow-models/universal-sentence-encoder";
 
 const ProcessAI: React.FC<HabitTitleProps> = ({ habitId, range }) => { // Use habitId and range
   const [suggestion, setSuggestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sentiment, setSentiment] = useState<number | null>(null); // Add sentiment state
+  const [model, setModel] = useState<use.UniversalSentenceEncoder | null>(null); // Add model state
+
+  // Load the model only once when the component mounts
+  useEffect(() => {
+    const loadModelAndSetBackend = async () => {
+      try {
+        // Try to set the WebGL backend
+        await tf.setBackend('webgl');
+        console.log("Using WebGL backend");
+      } catch (error) {
+        console.warn("WebGL backend not available, falling back to CPU.");
+        await tf.setBackend('cpu'); // Fallback to CPU
+      }
+  
+      try {
+        const loadedModel = await use.load();
+        setModel(loadedModel);
+      } catch (err) {
+        console.error("Error loading the model:", err);
+      }
+    };
+    loadModelAndSetBackend();
+  }, []);
+
 
   const handleGenerateSuggestion = async () => {
     if (!habitId) { // Check for habitId, not habitTitle
@@ -42,6 +72,51 @@ const ProcessAI: React.FC<HabitTitleProps> = ({ habitId, range }) => { // Use ha
     }
   };
 
+  const analyzeSentiment = async (text: string) => {
+    if (!model) {
+        console.warn("Sentiment model not loaded yet.");
+        return;
+    }
+
+    setLoading(true);
+    try {
+        const embeddings = await model.embed(text);
+        // The Universal Sentence Encoder returns embeddings, not direct sentiment.
+        // You'll need a simple classifier on top.  For a quick demo, we'll
+        // just use the first element of the embedding as a *proxy* for sentiment.
+        // In a real application, you'd train a separate classifier.
+        const sentimentScore = (await embeddings.data())[0];
+        setSentiment(sentimentScore);
+    } catch (err) {
+        console.error("Error analyzing sentiment:", err);
+    } finally {
+        setLoading(false);
+    }
+};
+// get habit title
+useEffect(() => {
+  const fetchHabitTitle = async () => {
+    if (!habitId) return;
+    try {
+      const res = await fetch(`/api/habits/${habitId}`); // Replace with your actual API endpoint
+      
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+        if (data && data.title) { // Assuming your API returns the title in a 'title' field
+          analyzeSentiment(data.title);
+        }
+      } else {
+        console.error("Failed to fetch habit title");
+      }
+    } catch (error) {
+      console.error("Error fetching habit title:", error);
+    }
+  };
+
+  fetchHabitTitle();
+}, [habitId, model]); // Depend on habitId and model
+
   return (
     <div className="p-4 border rounded">
       <h2 className="text-lg font-semibold">AI Goal & Habit Improvement</h2>
@@ -54,6 +129,13 @@ const ProcessAI: React.FC<HabitTitleProps> = ({ habitId, range }) => { // Use ha
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
       {suggestion && <FormattedSuggestion text={suggestion} />}
+
+      {/* Display the sentiment score */}
+      {sentiment !== null && (
+                <p className="mt-2">
+                    Sentiment Score: {sentiment.toFixed(2)} (Higher is more positive)
+                </p>
+            )}
     </div>
   );
 };
