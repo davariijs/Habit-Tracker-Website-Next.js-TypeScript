@@ -31,22 +31,23 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 
-export async function GET(req: Request, { params }: { params: { habitId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   await connectMongo();
-  const { habitId } = params;
+  const { id } = params; // Use 'id' to match the filename [id]
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(habitId)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ message: 'Invalid habit ID' }, { status: 400 });
     }
 
-    const habit = await HabitModel.findById(new mongoose.Types.ObjectId(habitId));
+    const habit = await HabitModel.findById(id); // Pass id directly
     if (!habit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
 
-    return NextResponse.json(habit);
+    return NextResponse.json({title: habit.name}); // Return the habit object
   } catch (error) {
-    return NextResponse.json({ message: 'Server error', error }, { status: 500 });
+    console.error("Error fetching habit:", error); // Log the error
+    return NextResponse.json({ message: 'Server error', error: String(error) }, { status: 500 });
   }
 }
