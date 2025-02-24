@@ -54,7 +54,7 @@ const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor,habitTitle
     <div className='flex flex-1 flex-col space-y-5 px-6'>
       <div className='flex items-start justify-between py-3'>
             <Heading
-            title='Habit Progress'
+            title='Habit Progress & Charts'
             description=''
             />
       </div>

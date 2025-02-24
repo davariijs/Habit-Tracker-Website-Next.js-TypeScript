@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/chart';
 import { useHabitModel } from './HabitModelContext';
 import HabitTrainer from './HabitTrainer';
+import { Button } from '../ui/button';
 
 export const description = 'An interactive bar chart';
 
@@ -154,10 +155,14 @@ const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range,habitC
 
   return (
     <Fragment>
-      <div>
-        <button 
+      <div className='flex justify-center'>
+      <Button
+        variant='default' size='lg'
+        className=''
         onClick={clickHandler}
-        >Get Predictions for doing hobbits</button>
+            >
+        Get Predictions for doing hobbits
+        </Button>
       </div>
       <Card>
       <CardHeader className='flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row'>

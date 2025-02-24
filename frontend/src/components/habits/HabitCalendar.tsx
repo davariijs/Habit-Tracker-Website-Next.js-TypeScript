@@ -27,7 +27,6 @@ const HabitCalendar: React.FC<HabitCalendarProps> = ({ habit, isVisible,colorChe
   const weekStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday
   const daysOfMonth = eachDayOfInterval({ start: weekStart, end: addDays(monthEnd, 6-monthEnd.getDay()) });
   const dayNumber = daysOfMonth.map(day => day.getDate());
-  console.log(dayNumber);
   if (!isVisible) {
     return null; // Don't render anything if not visible
   }

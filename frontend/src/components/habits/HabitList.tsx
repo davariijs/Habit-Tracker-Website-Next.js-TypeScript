@@ -21,6 +21,14 @@ import { format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval } from 'da
 import EditIcon from '@mui/icons-material/Edit';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
+import { Button } from '../ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
 
 interface HabitListProps {
   userId: string;
@@ -104,7 +112,8 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
     <List>
       {habits.map((habit) => (
         <React.Fragment key={String(habit._id)}>
-        <ListItem  divider>
+          <Card className='mb-8 p-3'>
+          <ListItem>
           <Box sx={{ width: '100%' , cursor: 'pointer'}}>
             <ListItemText
               primary={habit.name}
@@ -123,7 +132,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
               secondary: { style: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)' } }
              }} // Use slotProps
             />
-            <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
+            <Box sx={{ marginTop:"20px"}} display="flex" justifyContent="center" alignItems="center" gap={1}>
                 {daysOfWeek.map((day) => {
                     const completion = habit.completions.find((c) => isSameDay(c.date, day));
                     const isCompleted = completion ? completion.completed : false;
@@ -144,12 +153,13 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
                         </Box>
                     );
                 })}
-                {/* Edit Button */}
+              </Box>
+              <div className='flex justify-center my-3'>
                 <IconButton
                     sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}}
                     edge="end"
                     aria-label="edit"
-                    onClick={() => onEditHabit(habit)} // Call onEditHabit
+                    onClick={() => onEditHabit(habit)}
                 >
                   <EditIcon />
                 </IconButton>
@@ -160,16 +170,26 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
                 <IconButton sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}} edge="end" aria-label="calendar" onClick={() => toggleCalendar(String(habit._id))}>
                   <CalendarMonthIcon />
                 </IconButton>
+                
+                </div>
+                <div className=' flex justify-center'>
+                <Button
+                variant='default' size='sm'
+                
+                    >
                 <Link href={{
-              pathname: `/dashboard/habits/${habit._id}`,
-              query: { color: habit.color, title: habit.name },
-            }}>Habit</Link>
-              </Box>
+                  pathname: `/dashboard/habits/${habit._id}`,
+                  query: { color: habit.color, title: habit.name },
+                }}>Habit Progress & Charts</Link>
+                </Button>
+                </div>
+                
             </Box>
           </ListItem>
           <ListItem>
             <HabitCalendar habit={habit} isVisible={visibleCalendar === String(habit._id)} colorCheck={habit.color}/>
           </ListItem>
+          </Card>
         </React.Fragment>
       ))}
     </List>

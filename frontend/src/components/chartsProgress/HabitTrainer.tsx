@@ -1,4 +1,3 @@
-// HabitTrainer.tsx (or within ProcessAI.tsx)
 "use client";
 
 import React, { useState, useEffect } from 'react';

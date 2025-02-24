@@ -16,9 +16,7 @@ export default async function Dashboard() {
   } finally {
     let session = await getServerSession(authConfig);
     if (session?.user) {
-      redirect('/dashboard/overview');
+      redirect('/dashboard/habits');
     }
   }
 }
-
-// curl -X POST http://localhost:3000/api/notification/start-scheduler
