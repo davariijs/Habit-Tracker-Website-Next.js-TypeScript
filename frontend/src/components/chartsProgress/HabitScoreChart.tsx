@@ -164,47 +164,7 @@ const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range,habitC
         Get Predictions for doing hobbits
         </Button>
       </div>
-      <Card>
-      <CardHeader className='flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row'>
-        <div className='flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6'>
-          <CardTitle>Score</CardTitle>
-          <CardDescription>
-          </CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent className='px-2 sm:p-6'>
-        <HabitTrainer habitId={habitId} />  
-        <ChartContainer
-          config={chartConfig}
-          className='aspect-auto h-[280px] w-full'
-        >
-          <LineChart
-            accessibilityLayer
-            data={[...data]} 
-            margin={{
-              left: 12,
-              right: 12
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="time"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-            />
-            <YAxis domain={[0, 100]} tickFormatter={(tick) => `${tick}%`}/>
-            <ChartTooltip
-            />
-            <Line type="monotone" dataKey="score" stroke={habitColor} name="Completion %"  />
-          
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
-
-    {showPredict ? 
+      {showPredict ? 
     <Card>
     <CardHeader className='flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row'>
       <div className='flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6'>
@@ -254,7 +214,45 @@ const HabitScoreChart: React.FC<HabitScoreChartProps> = ({ habitId, range,habitC
     : null
   }
 
-
+      <Card>
+      <CardHeader className='flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row'>
+        <div className='flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6'>
+          <CardTitle>Score</CardTitle>
+          <CardDescription>
+          </CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className='px-2 sm:p-6'>
+        <HabitTrainer habitId={habitId} />  
+        <ChartContainer
+          config={chartConfig}
+          className='aspect-auto h-[280px] w-full'
+        >
+          <LineChart
+            accessibilityLayer
+            data={[...data]} 
+            margin={{
+              left: 12,
+              right: 12
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="time"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={32}
+            />
+            <YAxis domain={[0, 100]} tickFormatter={(tick) => `${tick}%`}/>
+            <ChartTooltip
+            />
+            <Line type="monotone" dataKey="score" stroke={habitColor} name="Completion %"  />
+          
+          </LineChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
     </Fragment>
   );
 }
