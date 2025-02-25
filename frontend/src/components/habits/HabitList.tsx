@@ -29,6 +29,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
 
 interface HabitListProps {
   userId: string;
@@ -39,6 +40,8 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
   const { data, error, isLoading, mutate } = useSWR(`/api/habits?userId=${userId}`, fetcher);
   const [visibleCalendar, setVisibleCalendar] = useState<string | null>(null);
   const { theme } = useTheme();
+  const [loading, setLoading] = useState<string | null>(null);
+const router = useRouter();
   const toggleCalendar = (habitId: string) => {
     setVisibleCalendar((prevId) => (prevId === habitId ? null : habitId));
   };
@@ -97,7 +100,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
     }
   };
 
-  if (isLoading) return <CircularProgress />;
+  if (isLoading) return <div className='flex justify-center items-center mt-40'><CircularProgress /></div>;
   if (error) return <div>Failed to load habits</div>;
   if (!data) return <div>No habits found</div>;
 
@@ -174,13 +177,21 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
                 </div>
                 <div className=' flex justify-center'>
                 <Button
-                variant='default' size='sm'
-                
-                    >
-                <Link href={{
-                  pathname: `/dashboard/habits/${habit._id}`,
-                  query: { color: habit.color, title: habit.name },
-                }}>Habit Progress & Charts</Link>
+                  variant='default'
+                  size='sm'
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent default behavior of Link
+                    setLoading(String(habit._id)); // Set loading for this habit
+                    const url = `/dashboard/habits/${habit._id}?color=${encodeURIComponent(habit.color)}&title=${encodeURIComponent(habit.name)}`;
+                    router.push(url);
+                  }}
+                  disabled={loading === habit._id} // Disable button while loading
+                >
+                  {loading === habit._id ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    'Habit Progress & Charts'
+                  )}
                 </Button>
                 </div>
                 
