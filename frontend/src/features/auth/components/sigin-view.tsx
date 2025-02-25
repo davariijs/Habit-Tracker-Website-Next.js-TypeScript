@@ -2,8 +2,6 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import UserAuthForm from './user-auth-form';
-import UserRegisterForm from './user-register-form';
 import LoginAuth from './login-auth';
 
 export const metadata: Metadata = {

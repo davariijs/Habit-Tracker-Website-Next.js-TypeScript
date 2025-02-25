@@ -75,9 +75,6 @@ const HabitTrainer: React.FC<HabitTrainerProps> = ({ habitId }) => {
 
     return (
       <div>
-        {/* <p>Training Status: {trainingStatus}</p> */}
-        {/* You can add a button to manually trigger training if needed */}
-        {/* You could also display the trained model's weights, etc. */}
       </div>
     );
   };
