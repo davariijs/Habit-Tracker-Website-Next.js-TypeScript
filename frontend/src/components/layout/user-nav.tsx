@@ -11,13 +11,14 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { CircularProgress } from '@mui/material';
 import { signOut, useSession } from 'next-auth/react';
 export function UserNav() {
   const { data: session, status } = useSession();
 
 
   if (status === 'loading') {
-    return <p>Loading...</p>;
+    return <div className='flex justify-center items-center mt-40'><CircularProgress /></div>;
   }
 
   if (!session) {

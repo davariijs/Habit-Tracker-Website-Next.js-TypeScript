@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { CircularProgress } from '@mui/material';
 
 
 const AstronautPage: React.FC = () => {
@@ -159,7 +160,7 @@ const AstronautPage: React.FC = () => {
           color: 'white',
           fontSize: '24px',
         }}>
-          Loading...
+          <div className='flex justify-center items-center mt-40'><CircularProgress /></div>
         </div>
       )}
     </div>

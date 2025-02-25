@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import HabitCharts from '@/components/chartsProgress/HabitCharts';
+import { CircularProgress } from '@mui/material';
 
 
 interface HabitPageProps {
@@ -22,7 +23,7 @@ const HabitPage = ({ params, searchParams }: HabitPageProps) => {
 
   return (
     <div>
-      <Suspense fallback={<p>Loading...</p>}>
+      <Suspense fallback={<div className='flex justify-center items-center mt-40'><CircularProgress /></div>}>
         <HabitCharts habitId={params.habitId} habitColor={habitColor} habitTitle={habitTitle}/>
       </Suspense>
     </div>
