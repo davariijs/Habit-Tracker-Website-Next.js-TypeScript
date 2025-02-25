@@ -12,6 +12,8 @@ import PageContainer from '../layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+
 const AllHabits: React.FC = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingHabit, setEditingHabit] = useState<IHabit | null>(null); // State for tracking the habit being edited
@@ -26,9 +28,11 @@ const AllHabits: React.FC = () => {
         await createHabit(habitData);
         mutate(); // Refresh the habit list
         setShowForm(false);
-        setEditingHabit(null); // Reset editing state
+        setEditingHabit(null);
+        toast.success( 'Habit created successfully!');
       } catch (error) {
         console.error('Failed to create habit:', error);
+        toast.error('An error occurred while submitting the habit.');
       }
     };
   
@@ -39,9 +43,11 @@ const AllHabits: React.FC = () => {
         await updateHabit(editingHabit._id as string, habitData); // Use updateHabit API
         mutate(); // Refresh the habit list
         setShowForm(false);
-        setEditingHabit(null); // Reset editing state
+        setEditingHabit(null);
+        toast.success('Habit updated successfully!');
       } catch (error) {
         console.error('Failed to update habit:', error);
+        toast.error('An error occurred while submitting the habit.');
       }
     };
   
