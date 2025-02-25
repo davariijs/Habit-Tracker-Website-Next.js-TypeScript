@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import ProcessAI from './processAI';
 import PageContainer from '../layout/page-container';
+import { CircularProgress } from '@mui/material';
 
 
 interface HabitDetailProps {
@@ -46,7 +47,7 @@ const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor,habitTitle
     fetchHabit();
   }, [habitId]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div className='flex justify-center items-center mt-40'><CircularProgress /></div>;
   if (!habit) return <p>Habit not found</p>;
 
   return (
