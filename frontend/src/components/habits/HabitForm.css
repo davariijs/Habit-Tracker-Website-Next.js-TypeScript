@@ -1,0 +1,99 @@
+/* Define CSS variables for your default (light) theme */
+:root {
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --menu-item-bg: #ffffff;
+    --menu-item-hover-bg: #f0f0f0;
+    --menu-item-selected-bg: #e0e0e0;
+    --menu-item-disabled-bg: #ffffff;
+    --menu-item-disabled-color: #aaaaaa;
+    --select-bg: #ffffff; /* Background for the Select input */
+    --select-text-color: #000000; /* Text color for the Select input */
+    --select-border-color: rgba(0, 0, 0, 0.23);
+    --select-border-hover-color: rgba(0, 0, 0, 0.87);
+    --select-border-focused-color: lightgray; /* Light gray for focused state */
+    --select-icon-color: rgba(0, 0, 0, 0.54); /* Icon color */
+    --menu-text-color: #000;
+  }
+  
+  /* Define CSS variables for your dark theme (using .dark class) */
+  .dark {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --menu-item-bg: #333333;
+    --menu-item-hover-bg: #444444;
+    --menu-item-selected-bg: #555555;
+    --menu-item-disabled-bg: #333333;
+    --menu-item-disabled-color: #777777;
+    --select-bg: #333333; /* Dark background for the Select input */
+    --select-text-color: #ffffff; /* White text for the Select input */
+    --select-border-color: rgba(255, 255, 255, 0.23);
+    --select-border-hover-color: rgba(255, 255, 255, 0.87);
+    --select-border-focused-color: lightgray; /* Light gray for focused - SAME */
+    --select-icon-color: rgba(255, 255, 255, 0.7); /* Icon color in dark mode */
+    --menu-text-color: #fff;
+  }
+  
+  
+  /* Styles for the Select component itself */
+  .my-custom-select .MuiInputBase-root {
+    background-color: var(--select-bg) !important;
+    color: var(--select-text-color) !important; /* Set input text color */
+    border-color: var(--select-border-color) !important;
+  }
+  
+  .my-custom-select .MuiInputBase-root:hover {
+    border-color: var(--select-border-hover-color) !important;
+  }
+  
+  /* Focused state - THIS IS THE KEY PART */
+  .my-custom-select .MuiInputBase-root.Mui-focused {
+    border-color: var(--select-border-focused-color) !important; /* Light gray border */
+  }
+  
+  .my-custom-select .MuiOutlinedInput-notchedOutline {
+      border-color: inherit !important;
+  }
+  
+  /* Focused state - ALSO TARGET THE OUTLINE */
+  .my-custom-select .MuiInputBase-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--select-border-focused-color) !important; /* Light gray outline */
+  }
+  
+  .my-custom-select .MuiSvgIcon-root {
+    color: var(--select-icon-color) !important;
+  }
+  
+  
+  /* Styles for the dropdown menu */
+  .my-custom-select-menu .MuiPaper-root {
+      background-color: var(--menu-item-bg) !important;
+      color: var(--menu-text-color) !important;
+      border-radius: 4px !important;
+      margin-top: 4px !important;
+      padding: 0 !important;
+      box-shadow: 0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12) !important;
+  }
+  
+  .my-custom-select-menu .MuiList-root {
+      padding: 0 !important;
+  }
+  
+  .my-custom-select-menu .MuiMenuItem-root {
+      background-color: transparent !important;
+      color: var(--menu-text-color) !important;
+  }
+  
+  .my-custom-select-menu .MuiMenuItem-root:hover {
+      background-color: var(--menu-item-hover-bg) !important;
+  }
+  
+  .my-custom-select-menu .MuiMenuItem-root.Mui-selected {
+      background-color: var(--menu-item-selected-bg) !important;
+  }
+  
+  .my-custom-select-menu .MuiMenuItem-root.Mui-disabled {
+      background-color: var(--menu-item-disabled-bg) !important;
+      color: var(--menu-item-disabled-color) !important;
+      opacity: 1 !important;
+  }
