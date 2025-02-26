@@ -30,11 +30,13 @@ import {
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip
+  ChartTooltip,
+  ChartTooltipContent
 } from '@/components/ui/chart';
 import { useHabitModel } from './HabitModelContext';
 import HabitTrainer from './HabitTrainer';
 import { Button } from '../ui/button';
+import "@/components/habits/HabitForm.css";
 
 export const description = 'An interactive bar chart';
 
