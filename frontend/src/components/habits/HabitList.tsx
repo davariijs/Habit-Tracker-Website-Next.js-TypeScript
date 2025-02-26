@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {
   List,
   ListItem,
@@ -14,39 +14,34 @@ import {
 import { IHabit } from '@/models/Habit';
 import useSWR from 'swr';
 import { fetcher, updateHabitCompletion, deleteHabit } from '@/lib/habitapi';
-import DeleteIcon from '@mui/icons-material/Delete';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import HabitCalendar from './HabitCalendar';
 import { format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import EditIcon from '@mui/icons-material/Edit';
 import { useTheme } from 'next-themes';
-import Link from 'next/link';
 import { Button } from '../ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
+import {Card} from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import { DeleteIconButton } from '../modal/delete-button';
 
 interface HabitListProps {
   userId: string;
   onEditHabit: (habit: IHabit) => void;
 }
 
-const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit }) => {
+const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit}) => {
   const { data, error, isLoading, mutate } = useSWR(`/api/habits?userId=${userId}`, fetcher);
   const [visibleCalendar, setVisibleCalendar] = useState<string | null>(null);
   const { theme } = useTheme();
   const [loading, setLoading] = useState<string | null>(null);
-const router = useRouter();
-  const toggleCalendar = (habitId: string) => {
-    setVisibleCalendar((prevId) => (prevId === habitId ? null : habitId));
-  };
+  const parentRef = useRef<HTMLDivElement>(null);
 
 
+  const router = useRouter();
+    const toggleCalendar = (habitId: string) => {
+      setVisibleCalendar((prevId) => (prevId === habitId ? null : habitId));
+    };
+    
   const onToggleComplete = async (habitId: string, date: Date, completed: boolean) => {
     mutate(
       async (currentData: any) => {
@@ -110,6 +105,10 @@ const router = useRouter();
     const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
     const daysOfWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
+    const handleEditClick = (habit: IHabit) => {
+      onEditHabit(habit);
+    };
+
 
   return (
     <List>
@@ -162,13 +161,16 @@ const router = useRouter();
                     sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}}
                     edge="end"
                     aria-label="edit"
-                    onClick={() => onEditHabit(habit)}
+                    onClick={() => handleEditClick(habit)}
                 >
                   <EditIcon />
                 </IconButton>
-                <IconButton sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}} edge="end" aria-label="delete" onClick={() => onDeleteHabit(String(habit._id))}>
-                    <DeleteIcon />
-                </IconButton>
+
+                <DeleteIconButton
+                  onDelete={onDeleteHabit}
+                  habitId={String(habit._id)}
+                  itemName="habit"
+                />
 
                 <IconButton sx={{  color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'}} edge="end" aria-label="calendar" onClick={() => toggleCalendar(String(habit._id))}>
                   <CalendarMonthIcon />
@@ -180,12 +182,12 @@ const router = useRouter();
                   variant='default'
                   size='sm'
                   onClick={(e) => {
-                    e.preventDefault(); // Prevent default behavior of Link
-                    setLoading(String(habit._id)); // Set loading for this habit
+                    e.preventDefault();
+                    setLoading(String(habit._id));
                     const url = `/dashboard/habits/${habit._id}?color=${encodeURIComponent(habit.color)}&title=${encodeURIComponent(habit.name)}`;
                     router.push(url);
                   }}
-                  disabled={loading === habit._id} // Disable button while loading
+                  disabled={loading === habit._id}
                 >
                   {loading === habit._id ? (
                     <CircularProgress size={20} color="inherit" />
