@@ -1,0 +1,13 @@
+{
+    "habit": {
+      "title": "Your Habits",
+      "edit": "Edit Habit",
+      "delete": "Delete Habit",
+      "progress": "Habit Progress & Charts",
+      "calendar": "View Calendar"
+    },
+    "dashboard": {
+      "welcome": "Welcome to the Dashboard",
+      "logout": "Logout"
+    }
+  }
