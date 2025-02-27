@@ -1,23 +1,13 @@
 'use client';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger
 } from '@/components/ui/collapsible';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -27,20 +17,13 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
-  useSidebar
+  SidebarRail
 } from '@/components/ui/sidebar';
 import { navItems } from '@/constants/data';
 import {
-  BadgeCheck,
-  Bell,
   ChevronRight,
-  ChevronsUpDown,
-  CreditCard,
-  GalleryVerticalEnd,
-  LogOut
+  CircleCheckBig,
 } from 'lucide-react';
-import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -48,14 +31,11 @@ import { Icons } from '../icons';
 
 export const company = {
   name: 'Habit Tracker',
-  logo: GalleryVerticalEnd,
-  plan: 'Web App'
+  logo: CircleCheckBig
 };
 
 export default function AppSidebar() {
-  const { data: session } = useSession();
   const pathname = usePathname();
-  const { state, isMobile } = useSidebar();
 
   return (
     <Sidebar collapsible='icon'>
@@ -64,9 +44,8 @@ export default function AppSidebar() {
           <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
             <company.logo className='size-4' />
           </div>
-          <div className='grid flex-1 text-left text-sm leading-tight'>
+          <div className='grid flex-1 self-center items-center text-left text-sm leading-tight'>
             <span className='truncate font-semibold'>{company.name}</span>
-            <span className='truncate text-xs'>{company.plan}</span>
           </div>
         </div>
       </SidebarHeader>
