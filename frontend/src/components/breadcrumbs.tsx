@@ -20,6 +20,7 @@ export function Breadcrumbs() {
       <BreadcrumbList>
         {items.map((item, index) => (
           <Fragment key={item.title}>
+            {/* Desktop View (hidden on small screens) */}
             {index !== items.length - 1 && (
               <BreadcrumbItem className='hidden md:block'>
                 <BreadcrumbLink href={item.link}>{item.title}</BreadcrumbLink>
@@ -30,8 +31,26 @@ export function Breadcrumbs() {
                 <Slash />
               </BreadcrumbSeparator>
             )}
-            {index === items.length - 1 && (
-              <BreadcrumbPage>{item.title}</BreadcrumbPage>
+
+            {/* Mobile View (only show last two items) */}
+            {(index >= items.length - 2) && (
+              <BreadcrumbItem className='md:hidden'>
+                <BreadcrumbLink href={item.link} className="text-sm"> {/* Smaller font */}
+                  {item.title}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
+
+             {/* Mobile Separator (only show between last two) */}
+            {(index === items.length - 2) && (
+                <BreadcrumbSeparator className='md:hidden'>
+                    <Slash className="size-3"/> {/* potentially smaller slash */}
+                </BreadcrumbSeparator>
+            )}
+
+            {/*  Always show the last item (current page) */}
+             {index === items.length - 1 && (
+              <BreadcrumbPage className='hidden md:block'>{item.title}</BreadcrumbPage> //desktop
             )}
           </Fragment>
         ))}
