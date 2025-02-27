@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {
   List,
   ListItem,
@@ -34,7 +34,6 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit}) => {
   const [visibleCalendar, setVisibleCalendar] = useState<string | null>(null);
   const { theme } = useTheme();
   const [loading, setLoading] = useState<string | null>(null);
-  const parentRef = useRef<HTMLDivElement>(null);
 
 
   const router = useRouter();
@@ -196,11 +195,12 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit}) => {
                   )}
                 </Button>
                 </div>
+
+                <div className=' flex justify-center mt-6'>
+                <HabitCalendar habit={habit} isVisible={visibleCalendar === String(habit._id)} colorCheck={habit.color}/>
+                </div>
                 
             </Box>
-          </ListItem>
-          <ListItem>
-            <HabitCalendar habit={habit} isVisible={visibleCalendar === String(habit._id)} colorCheck={habit.color}/>
           </ListItem>
           </Card>
         </React.Fragment>

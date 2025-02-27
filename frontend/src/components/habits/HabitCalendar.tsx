@@ -33,7 +33,7 @@ const HabitCalendar: React.FC<HabitCalendarProps> = ({ habit, isVisible,colorChe
 
   return (
     <Box>
-      <Typography variant="h6" align="center">{format(monthStart, 'MMMM yyyy')}</Typography> {/* Month/Year */}
+      <Typography sx={{marginBottom:"20px !important"}} variant="h6" align="center">{format(monthStart, 'MMMM yyyy')}</Typography> {/* Month/Year */}
       <Grid container spacing={1}>
         {/* Days of the week headers */}
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName) => (
