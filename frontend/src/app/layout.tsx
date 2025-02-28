@@ -27,6 +27,11 @@ export default async function RootLayout({
   const session = await getServerSession(authConfig);
   return (
     <html lang='en' className={`${lato.className}`} suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#f6e8de" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+      </head>
       <body className={'overflow-hidden'}>
         <NextTopLoader showSpinner={false} />
         <NuqsAdapter>
