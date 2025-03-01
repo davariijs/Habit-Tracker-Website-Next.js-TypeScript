@@ -46,6 +46,7 @@ function useSidebar() {
 
   return context;
 }
+const buttonVariants = () => "";
 
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
@@ -175,7 +176,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+    const { isMobile, state, openMobile, setOpenMobile, open, setOpen } = useSidebar();
 
     if (collapsible === 'none') {
       return (
@@ -195,9 +196,9 @@ const Sidebar = React.forwardRef<
     if (isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-           <SheetTitle className="sr-only">
-           <SheetDescription className="sr-only"></SheetDescription>
-           </SheetTitle>
+          <SheetTitle className="sr-only">
+          <SheetDescription className="sr-only"></SheetDescription>
+          </SheetTitle>
           <SheetContent
             data-sidebar='sidebar'
             data-mobile='true'
@@ -232,7 +233,8 @@ const Sidebar = React.forwardRef<
             'group-data-[side=right]:rotate-180',
             variant === 'floating' || variant === 'inset'
               ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]'
-              : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon]'
+              : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon]',
+              !open && 'hidden'
           )}
         />
         <div

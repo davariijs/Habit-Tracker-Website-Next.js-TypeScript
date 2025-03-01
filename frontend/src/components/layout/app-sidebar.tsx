@@ -25,7 +25,7 @@ import {
   CircleCheckBig,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
 
@@ -34,8 +34,42 @@ export const company = {
   logo: CircleCheckBig
 };
 
+type SidebarContext = {
+  state: 'expanded' | 'collapsed';
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  openMobile: boolean;
+  setOpenMobile: (open: boolean) => void;
+  isMobile: boolean;
+  toggleSidebar: () => void;
+};
+
+const SidebarContext = React.createContext<SidebarContext | null>(null);
+
+function useSidebar() {
+  const context = React.useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within a Sidebar.');
+  }
+  return context;
+}
+
 export default function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { setOpen, open } = useSidebar();
+
+  React.useEffect(() => {
+    setOpen(true);
+  }, [pathname, setOpen]);
+
+
+  const handleLinkClick = (href: string) => {
+    setOpen(false);
+    setTimeout(() => {
+      router.push(href);
+    }, 150);
+  };
 
   return (
     <Sidebar collapsible='icon'>
@@ -81,7 +115,10 @@ export default function AppSidebar() {
                               asChild
                               isActive={pathname === subItem.url}
                             >
-                              <Link href={subItem.url}>
+                              <Link href={subItem.url} onClick={(e) => {
+                                  e.preventDefault();
+                                  handleLinkClick(subItem.url);
+                                }}>
                                 <span>{subItem.title}</span>
                               </Link>
                             </SidebarMenuSubButton>
@@ -98,7 +135,10 @@ export default function AppSidebar() {
                     tooltip={item.title}
                     isActive={pathname === item.url}
                   >
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={(e) => {
+                        e.preventDefault();
+                        handleLinkClick(item.url);
+                      }}>
                       <Icon />
                       <span>{item.title}</span>
                     </Link>
