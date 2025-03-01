@@ -4,13 +4,17 @@ const STATIC_ASSETS = [
   "/manifest.json",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
-  "/offline.html" // Make sure this file exists!
+  "/offline.html" // Ensure this file exists!
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
+      console.log("Service Worker: Caching static assets");
       return cache.addAll(STATIC_ASSETS);
+    })
+    .then(() => {
+       self.skipWaiting(); // Force activation
     })
   );
   console.log("Service Worker Installed");
@@ -21,34 +25,53 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_NAME)
+          .filter((name) => name !== CACHE_NAME && name.startsWith("habit-tracker-cache-")) // More robust cache cleanup
           .map((name) => caches.delete(name))
       );
+    })
+    .then(() => {
+          self.clients.claim(); // Take control of all pages immediately
     })
   );
   console.log("Service Worker Activated");
 });
 
 self.addEventListener("fetch", (event) => {
+  // 1. Handle only GET requests for caching.
+  if (event.request.method !== "GET") {
+    // If it's not a GET request, let the network handle it.
+    console.log(`Service Worker: Bypassing cache for ${event.request.method} request to ${event.request.url}`);
+    return; // Important: Do *not* call event.respondWith() for non-GET requests.
+  }
+
+  // 2. Respond from cache if available.
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
+        console.log(`Service Worker: Serving from cache: ${event.request.url}`);
         return cachedResponse; // Serve from cache
       }
 
+      // 3. Fetch from network, cache, and return response.
+      console.log(`Service Worker: Fetching from network: ${event.request.url}`);
       return fetch(event.request)
         .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200) {
-            throw new Error("Network response was not ok");
+          // 4. Check for valid response before caching.
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+             console.log(`Service Worker: Not caching response for ${event.request.url} (status: ${networkResponse.status}, type: ${networkResponse.type})`);
+            return networkResponse; // Return, but don't cache.
           }
 
+          // 5. Cache the successful GET response.
           return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, networkResponse.clone());
+            console.log(`Service Worker: Caching new resource: ${event.request.url}`);
+            cache.put(event.request, networkResponse.clone()); // Clone is crucial!
             return networkResponse;
           });
         })
         .catch(() => {
-          // Return the offline page if the fetch request fails
+          // 6. Handle offline case.
+          console.log(`Service Worker: Offline, serving offline.html for ${event.request.url}`);
           return caches.match("/offline.html").then((offlinePage) => {
             return offlinePage || new Response("You are offline", {
               status: 503,
@@ -63,9 +86,15 @@ self.addEventListener("fetch", (event) => {
 
 // Push Notification Support
 self.addEventListener("push", (event) => {
-  const data = event.data.json();
-  self.registration.showNotification(data.title, {
-    body: data.body,
-    icon: "/icons/icon-192x192.png",
-  });
+  if (event.data) {
+        const data = event.data.json();
+        const options = {
+            body: data.body,
+            icon: "/icons/icon-192x192.png",
+            // Add more options as needed (e.g., actions, badge, image)
+        };
+        event.waitUntil(self.registration.showNotification(data.title, options));
+    } else {
+        console.log('Push event but no data');
+    }
 });
