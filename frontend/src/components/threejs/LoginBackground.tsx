@@ -4,7 +4,6 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Stars, useTexture } from "@react-three/drei";
 import { useRef, Suspense, useEffect, useState } from "react";
 import * as THREE from "three";
-// No need to import from three-stdlib directly
 
 interface ThreeBackgroundProps {
   children?: React.ReactNode;
@@ -44,10 +43,17 @@ const RotatingObject = () => {
   );
 };
 
-const ThreeBackground: React.FC<ThreeBackgroundProps> = ({ children }) => {
+// Define a separate component for the background mesh *and* its useFrame logic.
+const BackgroundMesh = () => {
   const shaderRef = useRef<THREE.ShaderMaterial>(null!);
 
-  // Use a custom shader for the background gradient
+    useFrame(({ clock }) => {
+        if (shaderRef.current) {
+            shaderRef.current.uniforms.iTime.value = clock.elapsedTime;
+        }
+    });
+
+    // Use a custom shader for the background gradient
   const gradientShader = {
     uniforms: {
       iTime: { value: 0 },
@@ -79,12 +85,31 @@ const ThreeBackground: React.FC<ThreeBackgroundProps> = ({ children }) => {
       }
     `,
   };
+  return (
+    <mesh>
+      <planeGeometry args={[100, 100]} /> {/* Large plane */}
+      <shaderMaterial
+        ref={shaderRef}
+        {...gradientShader}
+        side={THREE.DoubleSide} // Ensure it's visible from both sides
+      />
+    </mesh>
+  )
+}
 
-    useFrame(({ clock }) => {
-        if (shaderRef.current) {
-            shaderRef.current.uniforms.iTime.value = clock.elapsedTime;
-        }
-    });
+const ThreeBackground: React.FC<ThreeBackgroundProps> = ({ children }) => {
+  //const shaderRef = useRef<THREE.ShaderMaterial>(null!); // Moved to BackgroundMesh
+
+  // Use a custom shader for the background gradient -- MOVED to BackgroundMesh
+  /*const gradientShader = {
+   ...
+  };*/
+
+    // useFrame(({ clock }) => { MOVED to BackgroundMesh
+    //     if (shaderRef.current) {
+    //         shaderRef.current.uniforms.iTime.value = clock.elapsedTime;
+    //     }
+    // });
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
       
@@ -116,14 +141,7 @@ const ThreeBackground: React.FC<ThreeBackgroundProps> = ({ children }) => {
           <RotatingObject />
 
           {/* Background Plane with Custom Shader */}
-          <mesh>
-            <planeGeometry args={[100, 100]} /> {/* Large plane */}
-            <shaderMaterial
-              ref={shaderRef}
-              {...gradientShader}
-              side={THREE.DoubleSide} // Ensure it's visible from both sides
-            />
-          </mesh>
+          <BackgroundMesh/>
 
           <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.2} enableRotate={false} />
         </Suspense>
