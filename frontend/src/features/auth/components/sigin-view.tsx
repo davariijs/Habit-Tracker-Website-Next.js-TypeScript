@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import LoginAuth from './login-auth';
+import ClientOnlyFeature from '@/components/threejs/ClientOnlyFeature';
 
 export const metadata: Metadata = {
   title: 'Authentication',
@@ -22,8 +23,8 @@ export default function SignInViewPage({ stars }: { stars: number }) {
         Login
       </Link>
       <div className='relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex'>
-        <div className='absolute inset-0 bg-zinc-900' />
-        <div className='relative z-20 flex items-center text-lg font-medium'>
+        {/* <ClientOnlyFeature/> */}
+        {/* <div className='relative z-20 flex items-center text-lg font-medium'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
             viewBox='0 0 24 24'
@@ -47,7 +48,7 @@ export default function SignInViewPage({ stars }: { stars: number }) {
             </p>
             <footer className='text-sm'>Random Dude</footer>
           </blockquote>
-        </div>
+        </div> */}
       </div>
       <div className='flex h-full items-center p-4 lg:p-8'>
         <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]'>
