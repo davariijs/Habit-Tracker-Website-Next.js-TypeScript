@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import LoginAuth from './login-auth';
-import ClientOnlyFeature from '@/components/threejs/ClientOnlyFeature';
 
 export const metadata: Metadata = {
   title: 'Authentication',
@@ -23,7 +22,7 @@ export default function SignInViewPage({ stars }: { stars: number }) {
         Login
       </Link>
       <div className='relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex'>
-        {/* <ClientOnlyFeature/> */}
+
         
       </div>
       <div className='flex h-full items-center p-4 lg:p-8'>
