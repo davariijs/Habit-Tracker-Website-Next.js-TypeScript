@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const geminiPrompt = formatDataForGemini(habit, aggregatedProgress, range);
 
     const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     const result = await model.generateContent(geminiPrompt);
     const response = await result.response;
     const text = response.text();
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Something went wrong!" }, { status: 500 });
   }
 }
+
 
 // CORRECTED: Includes previous week if habit didn't start this week
 function getAnalysisStartDate(habit: any): Date {
