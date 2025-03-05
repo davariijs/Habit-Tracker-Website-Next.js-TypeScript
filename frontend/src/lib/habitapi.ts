@@ -1,6 +1,3 @@
-
-import { IHabit } from '@/models/Habit';
-// --- IMPORTANT: Import HabitFormData ---
 import { HabitFormData } from '@/components/habits/HabitForm';
 
 
@@ -15,7 +12,7 @@ const createHabit = async (habitData: HabitFormData) => {
     body: JSON.stringify(habitData),
   });
   if (!response.ok) {
-    throw new Error('Failed to create habit'); // Throw error for SWR to handle
+    throw new Error('Failed to create habit');
   }
   return response.json();
 };
