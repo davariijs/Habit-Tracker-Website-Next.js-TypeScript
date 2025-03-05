@@ -4,7 +4,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger
 } from '@/components/ui/collapsible';
-
 import {
   Sidebar,
   SidebarContent,
@@ -22,54 +21,20 @@ import {
 import { navItems } from '@/constants/data';
 import {
   ChevronRight,
-  CircleCheckBig,
+  CircleCheckBig
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
 
 export const company = {
   name: 'Habit Tracker',
-  logo: CircleCheckBig
+  logo: CircleCheckBig,
 };
-
-type SidebarContext = {
-  state: 'expanded' | 'collapsed';
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  openMobile: boolean;
-  setOpenMobile: (open: boolean) => void;
-  isMobile: boolean;
-  toggleSidebar: () => void;
-};
-
-const SidebarContext = React.createContext<SidebarContext | null>(null);
-
-function useSidebar() {
-  const context = React.useContext(SidebarContext);
-  if (!context) {
-    throw new Error('useSidebar must be used within a Sidebar.');
-  }
-  return context;
-}
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { setOpen, open } = useSidebar();
-
-  React.useEffect(() => {
-    setOpen(true);
-  }, [pathname, setOpen]);
-
-
-  const handleLinkClick = (href: string) => {
-    setOpen(false);
-    setTimeout(() => {
-      router.push(href);
-    }, 150);
-  };
 
   return (
     <Sidebar collapsible='icon'>
@@ -78,7 +43,7 @@ export default function AppSidebar() {
           <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
             <company.logo className='size-4' />
           </div>
-          <div className='grid flex-1 self-center items-center text-left text-sm leading-tight'>
+          <div className='grid flex-1 text-left text-sm leading-tight'>
             <span className='truncate font-semibold'>{company.name}</span>
           </div>
         </div>
@@ -115,10 +80,7 @@ export default function AppSidebar() {
                               asChild
                               isActive={pathname === subItem.url}
                             >
-                              <Link href={subItem.url} onClick={(e) => {
-                                  e.preventDefault();
-                                  handleLinkClick(subItem.url);
-                                }}>
+                              <Link href={subItem.url}>
                                 <span>{subItem.title}</span>
                               </Link>
                             </SidebarMenuSubButton>
@@ -135,10 +97,7 @@ export default function AppSidebar() {
                     tooltip={item.title}
                     isActive={pathname === item.url}
                   >
-                    <Link href={item.url} onClick={(e) => {
-                        e.preventDefault();
-                        handleLinkClick(item.url);
-                      }}>
+                    <Link href={item.url}>
                       <Icon />
                       <span>{item.title}</span>
                     </Link>
@@ -149,6 +108,7 @@ export default function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+
       <SidebarRail />
     </Sidebar>
   );
