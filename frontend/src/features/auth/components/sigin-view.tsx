@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: 'Authentication forms built using the components.'
 };
 
-export default function SignInViewPage({ stars }: { stars: number }) {
+export default function SignInViewPage() {
   return (
     <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
       <Link
@@ -36,23 +36,6 @@ export default function SignInViewPage({ stars }: { stars: number }) {
             </p>
           </div>
           <LoginAuth/>
-          <p className='px-8 text-center text-sm text-muted-foreground'>
-            By clicking continue, you agree to our{' '}
-            <Link
-              href='/terms'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link
-              href='/privacy'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              Privacy Policy
-            </Link>
-            .
-          </p>
         </div>
       </div>
     </div>
