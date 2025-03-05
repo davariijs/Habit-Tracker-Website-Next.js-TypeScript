@@ -23,17 +23,16 @@ const HabitCalendar: React.FC<HabitCalendarProps> = ({ habit, isVisible,colorChe
   const today = new Date();
   const monthStart = startOfMonth(today);
   const monthEnd = endOfMonth(today);
-  // Get all days of the month, starting on the correct day of the week
-  const weekStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday
+  const weekStart = startOfWeek(monthStart, { weekStartsOn: 1 });
   const daysOfMonth = eachDayOfInterval({ start: weekStart, end: addDays(monthEnd, 6-monthEnd.getDay()) });
   const dayNumber = daysOfMonth.map(day => day.getDate());
   if (!isVisible) {
-    return null; // Don't render anything if not visible
+    return null;
   }
 
   return (
     <Box>
-      <Typography sx={{marginBottom:"20px !important"}} variant="h6" align="center">{format(monthStart, 'MMMM yyyy')}</Typography> {/* Month/Year */}
+      <Typography sx={{marginBottom:"20px !important"}} variant="h6" align="center">{format(monthStart, 'MMMM yyyy')}</Typography>
       <Grid container spacing={1}>
         {/* Days of the week headers */}
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName) => (
@@ -57,7 +56,7 @@ const HabitCalendar: React.FC<HabitCalendarProps> = ({ habit, isVisible,colorChe
                 <Typography variant="button">{day.getDate()}</Typography>
                 </IconButton>
               ) : (
-                <Box width="24px" height="24px"/> // Placeholder for days outside current month
+                <Box width="24px" height="24px"/>
               )}
             </Grid>
           );
