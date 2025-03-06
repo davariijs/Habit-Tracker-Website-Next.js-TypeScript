@@ -34,7 +34,7 @@ export default function GithubSignInButton() {
         ) : (
         <div className='flex'>
         <Icons.gitHub className='mr-2 h-4 w-4' />
-        Continue with Github
+        Github
         </div>
       )}
       

@@ -34,7 +34,7 @@ export default function GoogleSignInButton() {
               ) : (
               <div className='flex'>
               <GoogleIcon sx={{width:'16px', height:'16px'}}/>
-              <div className='ml-2'>Continue with Google</div>
+              <div className='ml-2'>Google</div>
               </div>
             )}
       
