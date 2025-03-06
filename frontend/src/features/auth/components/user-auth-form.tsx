@@ -114,7 +114,7 @@ export default function UserAuthForm() {
               </FormItem>
             )}
           />
-          {error && <p className="text-red-500">{error}</p>} {/* Display error message */}
+          {error && <p className="text-red-500">{error}</p>}
         <Button disabled={loading} className='ml-auto w-full' type='submit'>
         {loading ? 'Logging in...' : 'Login'}
         </Button>
@@ -130,8 +130,10 @@ export default function UserAuthForm() {
           </span>
         </div>
       </div>
+      <div className='grid grid-cols-2 gap-4'>
       <GithubSignInButton />
       <GoogleSignInButton/>
+      </div>
     </>
   );
 }
