@@ -23,10 +23,10 @@ export default function LoginAuth() {
       <>
         {!showLoginForm && !showRegisterForm && (
           <>
-            <Button onClick={handleShowLoginForm} className='ml-auto w-full' type='button'>
+            <Button onClick={handleShowLoginForm} className='ml-auto w-full bg-color-dark text-white   hover:text-black' type='button'>
               Login
             </Button>
-            <Button onClick={handleShowRegisterForm} className='ml-auto w-full' type='button'>
+            <Button onClick={handleShowRegisterForm} className='ml-auto w-full bg-blue-600 text-white  hover:text-black' type='button'>
               Register
             </Button>
           </>
@@ -35,7 +35,7 @@ export default function LoginAuth() {
         {showLoginForm && (
           <>
             <UserAuthForm />
-            <Button onClick={handleShowRegisterForm} variant="link" className="px-0 mt-2 text-sm text-muted-foreground">
+            <Button onClick={handleShowRegisterForm} variant="link" className="px-0 text-xs mt-2 lg:text-sm text-muted-foreground">
               Create new account
             </Button>
           </>
@@ -44,7 +44,7 @@ export default function LoginAuth() {
         {showRegisterForm && (
           <>
             <UserRegisterForm />
-            <Button onClick={handleShowLoginForm} variant="link" className="px-0 mt-2 text-sm text-muted-foreground">
+            <Button onClick={handleShowLoginForm} variant="link" className="px-0 text-xs mt-2 lg:text-sm text-muted-foreground">
               Already have an account?
             </Button>
           </>
