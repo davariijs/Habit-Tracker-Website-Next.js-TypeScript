@@ -96,9 +96,10 @@ export default function UserRegisterForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel className='text-xs'>Name</FormLabel>
               <FormControl>
                 <Input
+                className='text-xs'
                   placeholder="Enter your name..."
                   disabled={loading}
                   {...field}
@@ -114,9 +115,10 @@ export default function UserRegisterForm() {
             name='email'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className='text-xs'>Email</FormLabel>
                 <FormControl>
                   <Input
+                  className='text-xs'
                     type='email'
                     placeholder='Enter your email...'
                     disabled={loading}
@@ -133,9 +135,10 @@ export default function UserRegisterForm() {
             name='password'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel className='text-xs'>Password</FormLabel>
                 <FormControl>
                   <Input
+                  className='text-xs'
                     type='password'
                     placeholder='Enter your password...'
                     disabled={loading}

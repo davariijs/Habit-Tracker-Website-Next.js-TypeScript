@@ -72,7 +72,7 @@ export default function UserAuthForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className='w-full space-y-2'
+          className='w-full space-y-2 text-xs lg:text-base'
         >
 
           <FormField
@@ -80,9 +80,10 @@ export default function UserAuthForm() {
             name='email'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className='text-xs'>Email</FormLabel>
                 <FormControl>
                   <Input
+                  className='text-xs'
                     type='email'
                     placeholder='Enter your email...'
                     disabled={loading}
@@ -99,9 +100,10 @@ export default function UserAuthForm() {
             name='password'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel className='text-xs'>Password</FormLabel>
                 <FormControl>
                   <Input
+                  className='text-xs'
                     type='password'
                     placeholder='Enter your password...'
                     disabled={loading}
@@ -123,7 +125,7 @@ export default function UserAuthForm() {
           <span className='w-full border-t' />
         </div>
         <div className='relative flex justify-center text-xs uppercase'>
-          <span className='bg-background px-2 text-muted-foreground'>
+          <span className='bg-background px-2 py-2 lg:py-0 text-muted-foreground'>
             Or continue with
           </span>
         </div>
