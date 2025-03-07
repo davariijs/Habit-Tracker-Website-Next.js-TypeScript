@@ -1,11 +1,15 @@
 {
     "name": "Habit Tracker",
     "short_name": "Habit",
-    "description": "",
+    "description": "Track your daily habits effectively",
     "start_url": "/",
     "display": "standalone",
+    "display_override": ["window-controls-overlay", "minimal-ui"],
     "background_color": "#ffffff",
     "theme_color": "#f6e8de",
+    "id": "/",
+    "scope": "/",
+    "prefer_related_applications": false,
     "icons": [
       {
         "src": "/icons/icon-72x72.png",
@@ -51,13 +55,13 @@
     "screenshots": [
     {
       "src": "/screenshots/screenshot1.png",
-      "sizes": "1024x575",
+      "sizes": "1022x574",
       "type": "image/png",
       "form_factor": "wide"
     },
     {
       "src": "/screenshots/screenshot2.png",
-      "sizes": "1920x915",
+      "sizes": "1377x659",
       "type": "image/png",
       "form_factor": "narrow"
     }
