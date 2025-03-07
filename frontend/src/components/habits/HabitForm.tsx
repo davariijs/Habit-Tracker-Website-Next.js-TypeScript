@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useForm, Controller } from 'react-hook-form'; 
-import { Box, MenuItem, Select, SelectChangeEvent, InputLabel, FormControl, InputBase } from '@mui/material';
+import { Box, MenuItem, Select, SelectChangeEvent, InputLabel, FormControl} from '@mui/material';
 import "./HabitForm.css";
 
 
@@ -72,9 +72,9 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId}) =
       name: initialData?.name || '',
       color: initialData?.color || '#007bff',
       question: initialData?.question || '',
-      frequencyType: initialData?.frequencyType, // Initialize as empty string
-      frequencyValue: initialData?.frequencyValue,
-      frequencyValue2: initialData?.frequencyValue2,
+      frequencyType: initialData?.frequencyType || 'everyday',
+      frequencyValue: initialData?.frequencyValue || undefined,
+      frequencyValue2: initialData?.frequencyValue2 || undefined,
       reminderTime: initialData?.reminderTime || '',
     },
   });
