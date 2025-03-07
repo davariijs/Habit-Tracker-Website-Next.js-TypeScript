@@ -86,15 +86,36 @@
 
 // Push Notification Support
 self.addEventListener("push", (event) => {
-  if (event.data) {
-        const data = event.data.json();
-        const options = {
-            body: data.body,
-            icon: "/icons/icon-192x192.png",
-            // Add more options as needed (e.g., actions, badge, image)
-        };
-        event.waitUntil(self.registration.showNotification(data.title, options));
+    if (event.data) {
+      const data = event.data.json();
+      console.log("🔔 Received push notification:", data);
+  
+      const options = {
+        body: data.body || "You have a new reminder!",
+        icon: "/icons/icon-192x192.png",
+        badge: "/icons/icon-96x96.png", // ✅ Add a badge icon for better UX
+        timestamp: Date.now(), // ✅ Add timestamp for logging
+        vibrate: [200, 100, 200], // ✅ Add vibration pattern for better user experience
+        actions: [
+          {
+            action: "open_app",
+            title: "Open App",
+          },
+        ],
+      };
+  
+      event.waitUntil(
+        self.registration.showNotification(data.title || "Habit Reminder", options)
+      );
     } else {
-        console.log('Push event but no data');
+      console.log("❌ Push event received but no data.");
     }
-});
+  });
+  
+  // ✅ Handle notification click event
+  self.addEventListener("notificationclick", (event) => {
+    event.notification.close();
+    if (event.action === "open_app") {
+      event.waitUntil(clients.openWindow("/")); // ✅ Open the app when clicked
+    }
+  });
