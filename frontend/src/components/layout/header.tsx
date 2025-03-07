@@ -13,7 +13,7 @@ export default function Header() {
         <SidebarTrigger className='-ml-1' />
         <Separator orientation='vertical' className='mr-2 h-4' />
         <Breadcrumbs />
-        {/* <NotificationHandler/> */}
+        <NotificationHandler/>
       </div>
 
       <div className='flex items-center gap-2 px-4'>
