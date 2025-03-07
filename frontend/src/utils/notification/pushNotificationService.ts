@@ -1,5 +1,6 @@
 import webpush from "web-push";
 import User from "@/models/User";
+
 const VAPID_KEYS = {
   publicKey: "BOMxWltad74aktHYDh_E0pMxs8kH2maU0tbS4MuEwI-BM_dibL1xcu66pQ5FXD6G9v0gfgHyNBWwyyGl5hRZsQI",
   privateKey: "dV-qETfpjK5VOL9bonAWrC3y0F0zdsyVKtCDhZuXPOI",
@@ -11,7 +12,20 @@ webpush.setVapidDetails(
   VAPID_KEYS.privateKey
 );
 
-export const sendPushNotification = async (userEmail: string, title: string, message: string) => {
+// ✅ Track notifications per habit instead of per user
+const sentNotifications: { [key: string]: string } = {};
+
+
+export const clearSentNotification = (habitId: string) => {
+  Object.keys(sentNotifications).forEach((key) => {
+    if (key.includes(habitId)) {
+      console.log(`🔄 Resetting notification tracking for habit ID: ${habitId}`);
+      delete sentNotifications[key];
+    }
+  });
+};
+
+export const sendPushNotification = async (userEmail: string, habitId: string, title: string, message: string) => {
   console.log("📌 Sending push notification to user with email:", userEmail);
 
   if (!userEmail) {
@@ -19,18 +33,21 @@ export const sendPushNotification = async (userEmail: string, title: string, mes
     return;
   }
 
-  // ✅ Query by email instead of _id
   const user = await User.findOne({ email: userEmail });
 
-  console.log("🔍 Found user:", user);
-
-  if (!user) {
-    console.error(`❌ User not found with email: ${userEmail}`);
+  if (!user || !user.pushSubscription) {
+    console.error(`❌ User not found or no subscription: ${userEmail}`);
     return;
   }
 
-  if (!user.pushSubscription) {
-    console.error(`❌ No push subscription found for user: ${userEmail}`);
+  const today = new Date().toISOString().split("T")[0];
+  const notificationKey = `${userEmail}_${habitId}`;
+
+  // ✅ Reset notification tracking after updating reminder
+  if (!sentNotifications[notificationKey] || sentNotifications[notificationKey] !== today) {
+    sentNotifications[notificationKey] = today;
+  } else {
+    console.log(`⏳ Notification for ${title} (User: ${userEmail}) already sent today, skipping...`);
     return;
   }
 
@@ -38,17 +55,13 @@ export const sendPushNotification = async (userEmail: string, title: string, mes
 
   try {
     await webpush.sendNotification(user.pushSubscription, payload);
-    console.log("✅ Push notification sent successfully!");
+    console.log(`✅ Push notification for "${title}" sent successfully!`);
   } catch (error) {
     console.error("❌ Error sending push notification:", error);
     
-    if (error instanceof webpush.WebPushError) {
-      if (error.statusCode === 410 || error.statusCode === 404) {
-        console.log(`Subscription for user ${userEmail} is no longer valid. Removing it.`);
-        await User.findOneAndUpdate({ email: userEmail }, { $unset: { pushSubscription: "" } });
-      } else {
-        console.error("WebPushError:", error.statusCode, error.body, error.headers);
-      }
+    if (error instanceof webpush.WebPushError && (error.statusCode === 410 || error.statusCode === 404)) {
+      console.log(`Subscription for user ${userEmail} is invalid. Removing it.`);
+      await User.findOneAndUpdate({ email: userEmail }, { $unset: { pushSubscription: "" } });
     }
   }
 };
