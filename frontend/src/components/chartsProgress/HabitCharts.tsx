@@ -52,7 +52,7 @@ const HabitCharts: React.FC<HabitDetailProps> = ({ habitId,habitColor,habitTitle
 
   return (
     <PageContainer scrollable>
-    <div className='flex flex-1 flex-col space-y-5 px-6'>
+    <div className='flex flex-1 flex-col space-y-5 px-6 md:ml-10 ml-0'>
       <div className='flex items-start justify-between py-3'>
             <Heading
             title='Habit Progress & Charts'
