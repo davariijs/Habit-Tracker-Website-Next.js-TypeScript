@@ -37,3 +37,46 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "❌ Error saving subscription", error }, { status: 500 });
   }
 }
+
+
+// // app/api/notification/subscribe/route.ts
+// import { NextResponse } from "next/server";
+// import connectMongo from "@/utils/db";
+// import User from "@/models/User";
+// import { getServerSession } from "next-auth";
+// import authConfig from '@/lib/auth.config';
+
+// export async function POST(req: Request) {
+//   try {
+//     // Check authentication
+//     const session = await getServerSession(authConfig);
+//     if (!session?.user?.email) {
+//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//     }
+
+//     // Connect to database
+//     await connectMongo();
+    
+//     // Get subscription from request
+//     const { subscription } = await req.json();
+    
+//     // Update user with subscription
+//     const result = await User.findOneAndUpdate(
+//       { email: session.user.email },
+//       { pushSubscription: subscription },
+//       { new: true }
+//     );
+    
+//     if (!result) {
+//       return NextResponse.json({ error: "User not found" }, { status: 404 });
+//     }
+    
+//     return NextResponse.json({ success: true });
+//   } catch (error:any) {
+//     console.error("Error saving subscription:", error);
+//     return NextResponse.json({ 
+//       error: "Failed to save subscription",
+//       details: error.message 
+//     }, { status: 500 });
+//   }
+// }
