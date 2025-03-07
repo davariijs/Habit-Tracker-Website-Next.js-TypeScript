@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectMongo from '@/utils/db';
 import HabitModel, { IHabit } from '@/models/Habit';
 import { isSameDay } from 'date-fns';
+import { scheduleNotifications } from '@/utils/notification/notificationScheduler';
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,6 +34,11 @@ export async function POST(request: NextRequest) {
 
     const newHabit = new HabitModel(habitData);
     await newHabit.save();
+    console.log(`✅ New habit "${habitData.name}" saved!`);
+
+    // ✅ Restart the scheduler to include the new habit
+    await scheduleNotifications();
+
     return NextResponse.json({ habit: newHabit }, { status: 201 });
   } catch (error) {
     console.error(error);

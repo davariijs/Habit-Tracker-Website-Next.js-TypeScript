@@ -3,17 +3,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectMongo from '@/utils/db';
 import HabitModel, { IHabit } from '@/models/Habit';
 import mongoose from 'mongoose';
+import { scheduleNotifications } from '@/utils/notification/notificationScheduler';
+import { clearSentNotification } from "@/utils/notification/pushNotificationService"; 
+import schedule from "node-schedule";
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+
+export async function PUT(request: NextRequest, context: { params: { id: string } }) { 
   try {
     await connectMongo();
-    const habitId = params.id;
+    const { id: habitId } = context.params; 
+    // const habitId = params.id;
     const updatedData: Partial<IHabit> = await request.json();
 
     if (!habitId) {
       return NextResponse.json({ message: 'Missing habit ID' }, { status: 400 });
     }
 
+    const existingHabit = await HabitModel.findById(habitId);
+    if (!existingHabit) {
+      return NextResponse.json({ message: "Habit not found" }, { status: 404 });
+    }
+
+
+    // ✅ Cancel the existing scheduled job for this habit before updating
+    if (schedule.scheduledJobs[habitId]) {
+      console.log(`🛑 Cancelling previous schedule for: ${existingHabit.name}`);
+      schedule.scheduledJobs[habitId].cancel();
+    }
+
+    // ✅ Update the habit with the new reminder time
     const updatedHabit = await HabitModel.findByIdAndUpdate(habitId, updatedData, {
       new: true, // Return the updated document
       runValidators: true, // Ensure data validation
@@ -22,6 +40,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if (!updatedHabit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
+
+
+     // ✅ Reset notification tracking so it can be sent again
+     clearSentNotification(habitId);
+
+    // ✅ Reschedule notifications after updating
+    await scheduleNotifications();
 
     return NextResponse.json({ habit: updatedHabit }, { status: 200 });
   } catch (error) {
