@@ -29,9 +29,9 @@ interface Habit {
   completions: Completion[];
 }
 
-export async function GET(req: NextRequest, { params }: { params: { habitId: string; range: string } }) {
+export async function GET(req: NextRequest,   { params }: { params: Promise<{ habitId: string; range: string }> }) {
   await connectMongo();
-  const { habitId, range } = params;
+  const { habitId, range } = await params;
 
   try {
     if (!mongoose.Types.ObjectId.isValid(habitId)) {

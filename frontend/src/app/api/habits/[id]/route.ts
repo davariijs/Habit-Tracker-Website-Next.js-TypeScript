@@ -8,10 +8,10 @@ import { clearSentNotification } from "@/utils/notification/pushNotificationServ
 import schedule from "node-schedule";
 
 
-export async function PUT(request: NextRequest, context: { params: { id: string } }) { 
+export async function PUT(request: NextRequest,  { params }: { params: Promise<{ id: string }> }) { 
   try {
     await connectMongo();
-    const { id: habitId } = context.params; 
+    const habitId = (await params).id;
     // const habitId = params.id;
     const updatedData: Partial<IHabit> = await request.json();
 
@@ -56,16 +56,16 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
 }
 
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectMongo();
-  const { id } = params; // Use 'id' to match the filename [id]
+  const habitId = (await params).id; // Use 'id' to match the filename [id]
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(habitId)) {
       return NextResponse.json({ message: 'Invalid habit ID' }, { status: 400 });
     }
 
-    const habit = await HabitModel.findById(id); // Pass id directly
+    const habit = await HabitModel.findById(habitId); // Pass id directly
     if (!habit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }

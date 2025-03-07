@@ -7,6 +7,7 @@ import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 import { getServerSession } from 'next-auth/next';
 import authConfig from '@/lib/auth.config';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Habit Tracker',
@@ -31,6 +32,24 @@ export default async function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0e1111" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <Script id="pwa-debug" strategy="afterInteractive">
+        {`
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              navigator.serviceWorker.getRegistrations().then(registrations => {
+                console.log('SW Registrations:', registrations);
+              });
+              
+              // Check installability
+              window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                console.log('✅ PWA is installable!');
+                window.deferredPrompt = e;
+              });
+            });
+          }
+        `}
+      </Script>
       </head>
       <body className={'overflow-hidden'}>
         <NextTopLoader showSpinner={false} />
