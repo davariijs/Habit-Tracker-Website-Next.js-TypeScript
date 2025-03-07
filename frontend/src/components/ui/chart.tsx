@@ -90,10 +90,11 @@ ${colorConfig
       itemConfig.color;
     return color ? `  --color-${key}: ${color};` : null;
   })
+  .filter(Boolean) // Remove null entries
   .join('\n')}
 }
 `
-        )
+        ).join('') // Join the array of strings into a single string
       }}
     />
   );
