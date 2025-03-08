@@ -32,24 +32,29 @@ export default async function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0e1111" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <Script id="pwa-debug" strategy="afterInteractive">
+        <Script id="pwa-service-worker" strategy="afterInteractive">
         {`
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-              navigator.serviceWorker.getRegistrations().then(registrations => {
-                console.log('SW Registrations:', registrations);
-              });
-              
-              // Check installability
-              window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                console.log('✅ PWA is installable!');
-                window.deferredPrompt = e;
-              });
-            });
-          }
-        `}
-      </Script>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw-custom.js')
+              .then(reg => {
+                console.log("✅ Service Worker registered:", reg.scope);
+                
+                // Check if the app can be installed
+                window.addEventListener('beforeinstallprompt', (e) => {
+                  console.log('Install prompt triggered');
+                });
+              })
+              .catch(err => console.error("❌ Service Worker registration failed:", err));
+          });
+          
+          // Log when installation is available
+          window.addEventListener('appinstalled', (event) => {
+            console.log('App was installed', event);
+          });
+        }
+      `}
+        </Script>
       </head>
       <body className={'overflow-hidden'}>
         <NextTopLoader showSpinner={false} />

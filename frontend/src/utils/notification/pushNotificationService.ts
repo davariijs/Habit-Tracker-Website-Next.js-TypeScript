@@ -2,23 +2,14 @@ import webpush from "web-push";
 import User from "@/models/User";
 import NotificationLog from "@/models/NotificationLog";
 
-const VAPID_KEYS = {
-  publicKey: "BOMxWltad74aktHYDh_E0pMxs8kH2maU0tbS4MuEwI-BM_dibL1xcu66pQ5FXD6G9v0gfgHyNBWwyyGl5hRZsQI",
-  privateKey: "dV-qETfpjK5VOL9bonAWrC3y0F0zdsyVKtCDhZuXPOI",
-};
-
 webpush.setVapidDetails(
-  "mailto:narjesdavari0@gmail.com",
-  VAPID_KEYS.publicKey,
-  VAPID_KEYS.privateKey
+  process.env.VAPID_SUBJECT as string,
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string,
+  process.env.VAPID_PRIVATE_KEY as string
 );
-
-// ✅ Track notifications per habit instead of per user
-const sentNotifications: { [key: string]: string } = {};
 
 
 export const clearSentNotification = async (habitId: string): Promise<void> => {
-  // Delete notification logs for this habit
   await NotificationLog.deleteMany({ habitId });
   console.log(`🔄 Resetting notification tracking for habit ID: ${habitId}`);
 };
@@ -40,7 +31,6 @@ export const sendPushNotification = async (userEmail: string, habitId: string, t
 
   const today = new Date().toISOString().split("T")[0];
   
-  // Check if notification was already sent today (from database)
   const existingLog = await NotificationLog.findOne({
     habitId,
     userEmail,
@@ -58,7 +48,6 @@ export const sendPushNotification = async (userEmail: string, habitId: string, t
     await webpush.sendNotification(user.pushSubscription, payload);
     console.log(`✅ Push notification for "${title}" sent successfully!`);
     
-    // Log the sent notification to database
     await NotificationLog.create({
       habitId,
       userEmail,
@@ -67,17 +56,12 @@ export const sendPushNotification = async (userEmail: string, habitId: string, t
     
   } catch (error:any) {
     console.error("❌ Error sending push notification:", error);
-   
-    // if (error instanceof webpush.WebPushError && (error.statusCode === 410 || error.statusCode === 404)) {
-    //   console.log(`Subscription for user ${userEmail} is invalid. Removing it.`);
-    //   await User.findOneAndUpdate({ email: userEmail }, { $unset: { pushSubscription: "" } });
-    // }
 
     if (error instanceof webpush.WebPushError && (error.statusCode === 410 || error.statusCode === 404)) {
       console.log(`❌ Subscription for user ${userEmail} is invalid. Marking as expired.`);
       await User.findOneAndUpdate(
         { email: userEmail },
-        { $set: { "pushSubscription.expired": true } } // ✅ Mark as expired instead of deleting
+        { $set: { "pushSubscription.expired": true } }
       );
       return;
     }

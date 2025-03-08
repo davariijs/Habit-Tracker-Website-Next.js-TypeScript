@@ -13,7 +13,6 @@ import { Heading } from '@/components/ui/heading';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import PushNotificationSubscriber from '../notification/PushNotificationSubscriber';
 
 const AllHabits: React.FC = () => {
     const [showForm, setShowForm] = useState(false);

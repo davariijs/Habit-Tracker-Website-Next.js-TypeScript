@@ -14,19 +14,17 @@ export const subscribeToPushNotifications = async (userEmail: string) => {
   }
 
   try {
-    // ✅ Step 1: Register the service worker (if not already registered)
-    const registration = await navigator.serviceWorker.register("/sw.js");
+    const registration = await navigator.serviceWorker.register("/sw-custom.js");
 
-    // ✅ Step 2: Ensure the service worker is ready
     await navigator.serviceWorker.ready;
 
-    // ✅ Step 3: Subscribe to push notifications
+
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
     });
 
-    // ✅ Step 4: Send subscription to the server
+
     const response = await fetch("/api/notification/save-subscription", {
       method: "POST",
       body: JSON.stringify({ email:userEmail, subscription }),
