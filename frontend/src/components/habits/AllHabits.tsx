@@ -92,7 +92,6 @@ const AllHabits: React.FC = () => {
             />
           )}
           <HabitList userId={userId} onEditHabit={handleEditHabit} />
-          {/* <PushNotificationSubscriber/> */}
         </div>
         </PageContainer>
     );
