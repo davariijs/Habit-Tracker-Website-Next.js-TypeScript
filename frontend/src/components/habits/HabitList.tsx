@@ -67,8 +67,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit}) => {
 
     try {
       await updateHabitCompletion(habitId, date, completed);
-      // mutate(); // Don't revalidate immediately, do full refresh
-      window.location.reload(); // Force page refresh
+      window.location.reload();
     } catch (err) {
       console.error(err);
       mutate();
@@ -100,7 +99,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit}) => {
 
   const habits: IHabit[] = data.habits;
     const today = new Date();
-    const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday as start of week
+    const weekStart = startOfWeek(today, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
     const daysOfWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
@@ -118,20 +117,22 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit}) => {
           <Box sx={{ width: '100%' , cursor: 'pointer'}}>
             <ListItemText
               primary={habit.name}
-              secondary={`${habit.question} - ${habit.frequencyType} ${
+              secondary={`${habit.question} - ${
                 habit.frequencyType === 'everyXDays'
                     ? `every ${habit.frequencyValue} days`
+                    : habit.frequencyType === 'everyday'
+                    ? `Everyday`
                     : habit.frequencyType === 'XTimesPerWeek'
                     ? `${habit.frequencyValue} times per week`
                     : habit.frequencyType === 'XTimesPerMonth'
                     ? `${habit.frequencyValue} times per month`
                     : habit.frequencyType === 'XTimesInXDays'
                     ? `${habit.frequencyValue} times in ${habit.frequencyValue2} days`
-                    : '' // Handle other cases or provide a default
+                    : ''
                 }`}
               slotProps={{ primary: { style: { color: habit.color } },
               secondary: { style: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)' } }
-             }} // Use slotProps
+             }} 
             />
             <Box sx={{ marginTop:"20px"}} display="flex" justifyContent="center" alignItems="center" gap={1}>
                 {daysOfWeek.map((day) => {
@@ -140,7 +141,7 @@ const HabitList: React.FC<HabitListProps> = ({ userId, onEditHabit}) => {
 
                     return (
                         <Box key={day.toISOString()} display="flex" flexDirection="column" alignItems="center">
-                            <Typography variant="caption">{format(day, 'EEE')}</Typography> {/* Day abbreviation */}
+                            <Typography variant="caption">{format(day, 'EEE')}</Typography>
                             <Checkbox
                                 checked={isCompleted}
                                 onChange={() => onToggleComplete(String(habit._id), day, !isCompleted)}

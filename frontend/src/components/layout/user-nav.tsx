@@ -120,6 +120,7 @@ export function UserNav() {
                 variant="destructive" 
                 onClick={handleDeleteAccount}
                 disabled={isDeleting}
+                className='bg-red-600 text-white mb-2'
               >
                 {isDeleting ? 'Deleting...' : 'Delete Account'}
               </Button>

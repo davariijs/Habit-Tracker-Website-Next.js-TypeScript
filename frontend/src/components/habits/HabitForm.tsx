@@ -16,9 +16,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useForm, Controller } from 'react-hook-form'; 
-import { Box, MenuItem, Select, SelectChangeEvent, InputLabel, FormControl} from '@mui/material';
+import { useForm } from 'react-hook-form'; 
+import { Box} from '@mui/material';
 import "./HabitForm.css";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 const habitFormSchema = z.object({
@@ -54,18 +61,19 @@ export interface HabitFormData {
 
 interface HabitFormProps {
   onSubmit: (habitData: HabitFormData) => void;
-  initialData?: IHabit | null; // Accepts IHabit or null
+  initialData?: IHabit | null;
   userId: string;
+  onCancel?: () => void;
 }
 
-const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId}) => {
+const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId,onCancel}) => {
   const { data: session } = useSession();
   const userEmailForm = session?.user?.email ?? "";
   const userEmail: string = userEmailForm;
   const { theme } = useTheme();
 
 
-  // Initialize the form with react-hook-form and Zod
+
   const form = useForm<HabitFormValues>({
     resolver: zodResolver(habitFormSchema),
     defaultValues: {
@@ -73,11 +81,12 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId}) =
       color: initialData?.color || '#007bff',
       question: initialData?.question || '',
       frequencyType: initialData?.frequencyType || 'everyday',
-      frequencyValue: initialData?.frequencyValue || undefined,
-      frequencyValue2: initialData?.frequencyValue2 || undefined,
+      frequencyValue: initialData?.frequencyValue || 1,
+      frequencyValue2: initialData?.frequencyValue2 || 1,
       reminderTime: initialData?.reminderTime || '',
     },
   });
+  const frequencyType = form.watch('frequencyType');
 
   const onSubmitHandler = (data: HabitFormValues) => {
     
@@ -103,7 +112,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId}) =
   };
 
   const getMenuItemTextColor = () => {
-    return theme === 'dark' ? '#fff' : '#000'; // White text in dark mode, black in light mode
+    return theme === 'dark' ? '#fff' : '#000';
 };
 
 
@@ -159,145 +168,119 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId}) =
             )}
           />
 
-            <FormField
-            control={form.control}
-            name="frequencyType"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl fullWidth margin="normal" required>
-                  <InputLabel id="frequency-type-label" sx={{ color: getTextColor() }} >Frequency</InputLabel>
-                  <Controller
-                    name="frequencyType"
-                    control={form.control}
-                    render={({ field: { onChange, onBlur, value, ref } }) => (
-                      <Select
-                        labelId="frequency-type-label"
-                        id="frequencyType"
-                        value={value}
-                        label="Frequency"
-                        onChange={(event: SelectChangeEvent<IHabit['frequencyType']>) => {
-                          onChange(event.target.value as IHabit['frequencyType']);
-                        }}
-                        onBlur={onBlur}
-                        inputRef={ref}
-                        displayEmpty
-                        renderValue={(selected) => {
-                          if (!selected) {
-                            return <em style={{color: getTextColor()}}></em>;
-                          }
-                          const getFrequencyDisplayText = (frequencyType?: IHabit['frequencyType']) => {
-                            switch (frequencyType) {
-                              case 'everyday':        return 'Everyday';
-                              case 'everyXDays':       return 'Every X Days';
-                              case 'XTimesPerWeek':    return 'X Times Per Week';
-                              case 'XTimesPerMonth':   return 'X Times Per Month';
-                              case 'XTimesInXDays':    return 'X Times in X Days';
-                              default:                 return '';
-                            }
-                          };
-                          return getFrequencyDisplayText(selected as IHabit['frequencyType']);
-                        }}
+<FormField
+  control={form.control}
+  name="frequencyType"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Frequency</FormLabel>
+      <Select 
+        onValueChange={field.onChange} 
+        defaultValue={field.value}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Select frequency" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="everyday">Everyday</SelectItem>
+          <SelectItem value="everyXDays">Every X Days</SelectItem>
+          <SelectItem value="XTimesPerWeek">X Times Per Week</SelectItem>
+          <SelectItem value="XTimesPerMonth">X Times Per Month</SelectItem>
+          <SelectItem value="XTimesInXDays">X Times in X Days</SelectItem>
+        </SelectContent>
+      </Select>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
 
-                        sx={{
-                          '& .MuiInputBase-root': {
-                              borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)', // Dynamic border color
-                          },
-                          '& .MuiInputBase-root:hover': {
-                              borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.87)' : 'rgba(0, 0, 0, 0.87)', // Dynamic hover border color
-                          },
-                          '& .MuiInputBase-root.Mui-focused': {
-                              borderColor: theme === 'dark' ? '#90caf9' : '#1976d2', // Dynamic focused border color
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'inherit',
-                          },
-                          color: theme === 'dark' ? '#fff' : '#000',
-                      }}
 
-                      className="my-custom-select"  // Add this class!
-                      MenuProps={{
-                          className: "my-custom-select-menu", // Add this class to MenuProps!
-                      }}
-                      >
-                        <MenuItem  value="" disabled><em>Select Frequency</em></MenuItem>
-                        <MenuItem  value="everyday">Everyday</MenuItem>
-                        <MenuItem  value="everyXDays">Every X Days</MenuItem>
-                        <MenuItem  value="XTimesPerWeek">X Times Per Week</MenuItem>
-                        <MenuItem  value="XTimesPerMonth">X Times Per Month</MenuItem>
-                        <MenuItem  value="XTimesInXDays">X Times in X Days</MenuItem>
-                      </Select>
-                    )}
-                  />
-                </FormControl>
-                <FormMessage /> {/* Keep FormMessage for validation errors */}
-              </FormItem>
-            )}
+{frequencyType === 'everyXDays' && (
+  <FormField
+    control={form.control}
+    name="frequencyValue"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Every How Many Days?</FormLabel>
+        <ShadcnFormControl>
+          <Input 
+            type="number" 
+            min="1"
+            value={field.value || 1} 
+            onChange={(e) => field.onChange(e.target.value === '' ? 1 : parseInt(e.target.value))}
           />
+        </ShadcnFormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+)}
 
-          {/* Conditional Rendering based on Frequency Type */}
-          {form.getValues('frequencyType') === 'everyXDays' && (
-            <FormField
-              control={form.control}
-              name="frequencyValue"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: getTextColor() }}>Every How Many Days?</FormLabel>
-                  <FormControl fullWidth>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+{/* For XTimesPerWeek or XTimesPerMonth */}
+{(frequencyType === 'XTimesPerWeek' || frequencyType === 'XTimesPerMonth') && (
+  <FormField
+    control={form.control}
+    name="frequencyValue"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>
+          {frequencyType === 'XTimesPerWeek' ? 'Times Per Week' : 'Times Per Month'}
+        </FormLabel>
+        <ShadcnFormControl>
+          <Input 
+            type="number" 
+            min="1"
+            value={field.value || 1} 
+            onChange={(e) => field.onChange(e.target.value === '' ? 1 : parseInt(e.target.value))}
+          />
+        </ShadcnFormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+)}
+
+{/* For XTimesInXDays */}
+{frequencyType === 'XTimesInXDays' && (
+  <>
+    <FormField
+      control={form.control}
+      name="frequencyValue"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Times</FormLabel>
+          <ShadcnFormControl>
+            <Input 
+              type="number" 
+              min="1"
+              value={field.value || 1} 
+              onChange={(e) => field.onChange(e.target.value === '' ? 1 : parseInt(e.target.value))}
             />
-          )}
-
-          {(form.getValues('frequencyType') === 'XTimesPerWeek' || form.getValues('frequencyType') === 'XTimesPerMonth') && (
-            <FormField
-              control={form.control}
-              name="frequencyValue"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: getTextColor() }}>{form.getValues('frequencyType') === 'XTimesPerWeek' ? 'Times Per Week' : 'Times Per Month'}</FormLabel>
-                  <FormControl fullWidth>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              )}
+          </ShadcnFormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+    <FormField
+      control={form.control}
+      name="frequencyValue2"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>In How Many Days?</FormLabel>
+          <ShadcnFormControl>
+            <Input 
+              type="number" 
+              min="1"
+              value={field.value || 1} 
+              onChange={(e) => field.onChange(e.target.value === '' ? 1 : parseInt(e.target.value))}
             />
-          )}
-
-
-          {form.getValues('frequencyType') === 'XTimesInXDays' && (
-            <>
-              <FormField
-                control={form.control}
-                name="frequencyValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: getTextColor() }}>Times</FormLabel>
-                    <FormControl fullWidth>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="frequencyValue2"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: getTextColor() }}>In How Many Days?</FormLabel>
-                    <FormControl fullWidth>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </>
-          )}
+          </ShadcnFormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  </>
+)}
 
           <FormField
             control={form.control}
@@ -313,9 +296,27 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId}) =
             )}
           />
 
-          <Button type="submit" variant='default' className='w-full mt-2' size='lg'>
+        <div className="flex flex-col-reverse gap-2 mt-4">
+          {onCancel && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onCancel}
+              className="w-full order-2 sm:order-1"
+            >
+              Cancel
+            </Button>
+          )}
+          <Button 
+            type="submit" 
+            variant='default' 
+            className='w-full order-1 sm:order-2 sm:ml-auto'
+            size='lg'
+          >
             {initialData ? 'Update Habit' : 'Create Habit'}
           </Button>
+        </div>
+
         </form>
       </Form>
     </Box>
