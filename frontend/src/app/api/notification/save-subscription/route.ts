@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     const user = await User.findOneAndUpdate(
       { email: email }, 
-      { pushSubscription: subscription }, 
+      { pushSubscription: { ...subscription, expired: false } },
       { new: true }
     );
 
