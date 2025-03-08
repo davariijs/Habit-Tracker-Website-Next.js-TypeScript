@@ -7,6 +7,7 @@ const pushSubscriptionSchema = new Schema({
       p256dh: { type: String, required: true },
       auth: { type: String, required: true },
   },
+  expired: { type: Boolean, default: false }
 }, { _id: false }); // Prevent Mongoose from creating an _id for the subdocument
 
 export interface IUser extends Document {
