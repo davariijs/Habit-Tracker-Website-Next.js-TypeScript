@@ -296,7 +296,18 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId,onC
             )}
           />
 
-        <div className="flex flex-col-reverse gap-2 mt-4">
+        <div className="flex flex-col gap-2 mt-4">
+          <div>
+            <Button 
+              type="submit" 
+              variant='default' 
+              className='w-full order-1 sm:order-2 sm:ml-auto'
+              size='lg'
+            >
+              {initialData ? 'Update Habit' : 'Create Habit'}
+            </Button>
+          </div>
+          <div>
           {onCancel && (
             <Button 
               type="button" 
@@ -307,14 +318,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId,onC
               Cancel
             </Button>
           )}
-          <Button 
-            type="submit" 
-            variant='default' 
-            className='w-full order-1 sm:order-2 sm:ml-auto'
-            size='lg'
-          >
-            {initialData ? 'Update Habit' : 'Create Habit'}
-          </Button>
+          </div>
         </div>
 
         </form>
