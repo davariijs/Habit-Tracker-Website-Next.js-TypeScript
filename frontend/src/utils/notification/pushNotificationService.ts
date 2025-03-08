@@ -33,8 +33,8 @@ export const sendPushNotification = async (userEmail: string, habitId: string, t
 
   const user = await User.findOne({ email: userEmail });
 
-  if (!user || !user.pushSubscription) {
-    console.error(`❌ User not found or no subscription: ${userEmail}`);
+  if (!user || !user.pushSubscription || user.pushSubscription.expired) {
+    console.error(`❌ User not found or subscription invalid: ${userEmail}`);
     return;
   }
 
@@ -65,12 +65,21 @@ export const sendPushNotification = async (userEmail: string, habitId: string, t
       sentDate: today
     });
     
-  } catch (error) {
+  } catch (error:any) {
     console.error("❌ Error sending push notification:", error);
    
+    // if (error instanceof webpush.WebPushError && (error.statusCode === 410 || error.statusCode === 404)) {
+    //   console.log(`Subscription for user ${userEmail} is invalid. Removing it.`);
+    //   await User.findOneAndUpdate({ email: userEmail }, { $unset: { pushSubscription: "" } });
+    // }
+
     if (error instanceof webpush.WebPushError && (error.statusCode === 410 || error.statusCode === 404)) {
-      console.log(`Subscription for user ${userEmail} is invalid. Removing it.`);
-      await User.findOneAndUpdate({ email: userEmail }, { $unset: { pushSubscription: "" } });
+      console.log(`❌ Subscription for user ${userEmail} is invalid. Marking as expired.`);
+      await User.findOneAndUpdate(
+        { email: userEmail },
+        { $set: { "pushSubscription.expired": true } } // ✅ Mark as expired instead of deleting
+      );
+      return;
     }
   }
 };
