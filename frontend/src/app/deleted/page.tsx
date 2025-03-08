@@ -38,7 +38,7 @@ export default function AccountDeleted() {
         <h1 className="text-2xl font-bold">Account Deleted</h1>
         <p className="mt-4">
           Your account has been permanently deleted along with all your data.
-        Thank you for using our app. We're sorry to see you go.
+        Thank you for using our app.
         </p>
         <div className="mt-6">
           <Link 
