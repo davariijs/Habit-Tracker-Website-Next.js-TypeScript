@@ -80,8 +80,8 @@ const AllHabits: React.FC = () => {
                   variant='default' 
                   size='lg'
                   onClick={() => {
-                    setEditingHabit(null); // Clear any editing habit first
-                    setShowFormDialog(true); // Open dialog
+                    setEditingHabit(null);
+                    setShowFormDialog(true);
                   }}
                 >
                   <Plus className='mr-2 h-4 w-4' />
@@ -91,7 +91,6 @@ const AllHabits: React.FC = () => {
             </div>
           </div>
     
-          {/* Dialog for habit form */}
           <Dialog open={showFormDialog} onOpenChange={setShowFormDialog}>
             <DialogContent className="max-w-md">
               <DialogHeader>

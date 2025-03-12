@@ -14,7 +14,6 @@ const breakpoints = fullConfig?.theme?.screens || {
 };
 
 export function useBreakpoint<K extends string>(breakpointKey: K) {
-  console.log("breakpointKey:", breakpointKey); // Log the value
   if (!breakpointKey || breakpointKey.length === 0) {
     throw new Error("breakpointKey must be a non-empty string.");
   }

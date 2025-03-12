@@ -8,13 +8,13 @@ export async function GET(request: NextRequest) {
   try {
     await connectMongo();
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId'); // Get userId from query parameter
+    const userId = searchParams.get('userId');
 
     if (!userId) {
       return NextResponse.json({ message: 'userId is required' }, { status: 400 });
     }
 
-    const habits = await HabitModel.find({ userId }); // Filter by userId
+    const habits = await HabitModel.find({ userId });
     return NextResponse.json({ habits }, { status: 200 });
   } catch (error) {
     console.error(error);
@@ -27,16 +27,12 @@ export async function POST(request: NextRequest) {
     await connectMongo();
     const habitData: Omit<IHabit, '_id'> = await request.json();
 
-    // Basic validation (add more as needed)
     if (!habitData.userId || !habitData.name || !habitData.color || !habitData.question || !habitData.frequencyType) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
     const newHabit = new HabitModel(habitData);
     await newHabit.save();
-    console.log(`✅ New habit "${habitData.name}" saved!`);
-
-    // ✅ Restart the scheduler to include the new habit
     await scheduleNotifications();
 
     return NextResponse.json({ habit: newHabit }, { status: 201 });

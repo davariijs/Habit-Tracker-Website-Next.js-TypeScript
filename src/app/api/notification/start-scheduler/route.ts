@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
 import { scheduleNotifications } from "@/utils/notification/notificationScheduler";
 
-let schedulerStarted = false; // ✅ Prevent multiple scheduler starts
+let schedulerStarted = false;
 
 export async function POST() {
   try {
     if (schedulerStarted) {
-      console.log("⏳ Scheduler already started, skipping...");
       return NextResponse.json({ message: "✅ Scheduler already running!" });
     }
 
-    schedulerStarted = true; // ✅ Mark as started
+    schedulerStarted = true;
     await scheduleNotifications();
     
     return NextResponse.json({ message: "✅ Notification scheduler started!" });

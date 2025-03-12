@@ -50,7 +50,6 @@ export async function GET(req: NextRequest,   { params }: { params: Promise<{ ha
     let interval: Date[];
 
     if (range === 'day') {
-      // ✅ Show last 7 days
       startDate = subDays(now, 6);
       endDate = now;
       interval = eachDayOfInterval({ start: startDate, end: endDate });
@@ -81,7 +80,7 @@ export async function GET(req: NextRequest,   { params }: { params: Promise<{ ha
 
       let xLabel = '';
       if (range === 'day') {
-        xLabel = format(dateStart, 'MMM dd'); // Example: "Feb 15"
+        xLabel = format(dateStart, 'MMM dd'); 
       } else if (range === 'week') {
         xLabel = format(dateStart, 'MMM') === 'Jan' ? format(dateStart, 'MMM yyyy') : format(dateStart, 'MMM dd');
       } else if (range === 'month') {

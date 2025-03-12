@@ -1,4 +1,3 @@
-// app/api/habits/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import connectMongo from '@/utils/db';
 import HabitModel, { IHabit } from '@/models/Habit';
@@ -12,7 +11,6 @@ export async function PUT(request: NextRequest,  { params }: { params: Promise<{
   try {
     await connectMongo();
     const habitId = (await params).id;
-    // const habitId = params.id;
     const updatedData: Partial<IHabit> = await request.json();
 
     if (!habitId) {
@@ -24,28 +22,22 @@ export async function PUT(request: NextRequest,  { params }: { params: Promise<{
       return NextResponse.json({ message: "Habit not found" }, { status: 404 });
     }
 
-
-    // ✅ Cancel the existing scheduled job for this habit before updating
     if (schedule.scheduledJobs[habitId]) {
-      console.log(`🛑 Cancelling previous schedule for: ${existingHabit.name}`);
       schedule.scheduledJobs[habitId].cancel();
     }
 
-    // ✅ Update the habit with the new reminder time
+
     const updatedHabit = await HabitModel.findByIdAndUpdate(habitId, updatedData, {
-      new: true, // Return the updated document
-      runValidators: true, // Ensure data validation
+      new: true,
+      runValidators: true,
     });
 
     if (!updatedHabit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
 
+    clearSentNotification(habitId);
 
-     // ✅ Reset notification tracking so it can be sent again
-     clearSentNotification(habitId);
-
-    // ✅ Reschedule notifications after updating
     await scheduleNotifications();
 
     return NextResponse.json({ habit: updatedHabit }, { status: 200 });
@@ -58,21 +50,21 @@ export async function PUT(request: NextRequest,  { params }: { params: Promise<{
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectMongo();
-  const habitId = (await params).id; // Use 'id' to match the filename [id]
+  const habitId = (await params).id;
 
   try {
     if (!mongoose.Types.ObjectId.isValid(habitId)) {
       return NextResponse.json({ message: 'Invalid habit ID' }, { status: 400 });
     }
 
-    const habit = await HabitModel.findById(habitId); // Pass id directly
+    const habit = await HabitModel.findById(habitId);
     if (!habit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
 
-    return NextResponse.json({title: habit.name}); // Return the habit object
+    return NextResponse.json({title: habit.name});
   } catch (error) {
-    console.error("Error fetching habit:", error); // Log the error
+    console.error("Error fetching habit:", error);
     return NextResponse.json({ message: 'Server error', error: String(error) }, { status: 500 });
   }
 }

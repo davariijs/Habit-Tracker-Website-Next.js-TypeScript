@@ -38,11 +38,8 @@ export default async function RootLayout({
           window.addEventListener('load', function() {
             navigator.serviceWorker.register('/sw-custom.js')
               .then(reg => {
-                console.log("✅ Service Worker registered:", reg.scope);
-                
                 // Check if the app can be installed
                 window.addEventListener('beforeinstallprompt', (e) => {
-                  console.log('Install prompt triggered');
                 });
               })
               .catch(err => console.error("❌ Service Worker registration failed:", err));
@@ -50,7 +47,6 @@ export default async function RootLayout({
           
           // Log when installation is available
           window.addEventListener('appinstalled', (event) => {
-            console.log('App was installed', event);
           });
         }
       `}

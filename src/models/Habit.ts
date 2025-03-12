@@ -16,7 +16,7 @@ export interface IHabit extends Document {
 
 const HabitSchema: Schema = new Schema({
   userId: { type: String, required: true },
-  userEmail: { type: String, required: true }, // Add userId field
+  userEmail: { type: String, required: true },
   name: { type: String, required: true },
   color: { type: String, required: true },
   question: { type: String, required: true },

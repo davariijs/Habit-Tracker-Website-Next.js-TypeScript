@@ -46,18 +46,18 @@ export default function UserAuthForm() {
     setError(null);
 
     try {
-      // Use signIn with the 'credentials' provider
+
       const result = await signIn('credentials', {
-        redirect: false, // Prevent automatic redirect
+        redirect: false,
         email: data.email,
         password: data.password,
-        callbackUrl: '/dashboard' // Redirect to dashboard after successful login
+        callbackUrl: '/dashboard'
       });
 
       if (result?.error) {
-        setError(result.error); // Display the error from NextAuth
+        setError(result.error);
       } else {
-        router.push('/dashboard'); // Redirect manually if successful
+        router.push('/dashboard');
       }
     } catch (err) {
       console.error("Sign-in error:", err);

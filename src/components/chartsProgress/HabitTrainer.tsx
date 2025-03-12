@@ -27,7 +27,6 @@ const HabitTrainer: React.FC<HabitTrainerProps> = ({ habitId }) => {
       }
 
       setTrainingStatus('Preparing data...');
-      // Convert the data to tensors
       const xs = tf.tensor2d(data.map((item: any) => [
         ...item.dayOfWeek,
         item.completionsLast7Days,
@@ -35,26 +34,24 @@ const HabitTrainer: React.FC<HabitTrainerProps> = ({ habitId }) => {
       const ys = tf.tensor2d(data.map((item: any) => [item.completed]));
 
       setTrainingStatus('Creating model...');
-      // Define the model
       const newModel = tf.sequential();
       newModel.add(tf.layers.dense({
-        units: 10, // Number of neurons in the hidden layer
-        activation: 'relu', // Activation function
-        inputShape: [xs.shape[1]], // Input shape based on the number of features
+        units: 10,
+        activation: 'relu',
+        inputShape: [xs.shape[1]],
       }));
-      newModel.add(tf.layers.dense({ units: 1, activation: 'sigmoid' })); // Output layer (sigmoid for probability)
+      newModel.add(tf.layers.dense({ units: 1, activation: 'sigmoid' })); 
 
-      // Compile the model
       newModel.compile({
-        optimizer: 'adam', // Optimizer
-        loss: 'binaryCrossentropy', // Loss function for binary classification
-        metrics: ['accuracy'], // Evaluation metric
+        optimizer: 'adam',
+        loss: 'binaryCrossentropy', 
+        metrics: ['accuracy'], 
       });
 
       setTrainingStatus('Training model...');
-      // Train the model
+
       await newModel.fit(xs, ys, {
-        epochs: 50, // Number of training iterations
+        epochs: 50,
         callbacks: {
           onEpochEnd: (epoch, logs) => {
             setTrainingStatus(`Training... Epoch ${epoch + 1}: Loss = ${logs?.loss.toFixed(4)}, Accuracy = ${logs?.acc.toFixed(4)}`);
@@ -64,8 +61,8 @@ const HabitTrainer: React.FC<HabitTrainerProps> = ({ habitId }) => {
 
       setModel(newModel);
       setTrainingStatus('Model trained!');
-      xs.dispose(); //clean memory
-      ys.dispose(); //clean memory
+      xs.dispose();
+      ys.dispose();
     };
 
     trainModel();

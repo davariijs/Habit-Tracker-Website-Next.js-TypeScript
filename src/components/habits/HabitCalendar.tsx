@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, IconButton, Grid } from '@mui/material';
 import {
   format,
@@ -34,14 +34,12 @@ const HabitCalendar: React.FC<HabitCalendarProps> = ({ habit, isVisible,colorChe
     <Box>
       <Typography sx={{marginBottom:"20px !important"}} variant="h6" align="center">{format(monthStart, 'MMMM yyyy')}</Typography>
       <Grid container spacing={1}>
-        {/* Days of the week headers */}
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName) => (
           <Grid item xs={12/7} key={dayName} textAlign="center">
             <Typography variant="caption">{dayName}</Typography>
           </Grid>
         ))}
 
-        {/* Days of the month */}
         {daysOfMonth.map((day,index) => {
           const completion = habit.completions.find((c) => isSameDay(c.date, day));
           const isCompleted = completion ? completion.completed : false;

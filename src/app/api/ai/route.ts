@@ -41,16 +41,13 @@ export async function POST(req: NextRequest) {
 }
 
 
-// CORRECTED: Includes previous week if habit didn't start this week
+
 function getAnalysisStartDate(habit: any): Date {
   const now = new Date();
   const startOfWeek = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - now.getUTCDay()));
   const startOfLastWeek = new Date(Date.UTC(startOfWeek.getUTCFullYear(), startOfWeek.getUTCMonth(), startOfWeek.getUTCDate() - 7));
   const habitStartDate = new Date(habit.startDate);
   const habitStartUTC = new Date(Date.UTC(habitStartDate.getUTCFullYear(), habitStartDate.getUTCMonth(), habitStartDate.getUTCDate()));
-
-  // This is the crucial part:  If the habit started *this* week, use the habit's start date.
-  // Otherwise, use the start of *last* week.
   return habitStartUTC >= startOfWeek ? habitStartUTC : startOfLastWeek;
 }
 
@@ -97,7 +94,7 @@ function aggregateCompletions(habit: any, startDate: Date, range: string) {
   return aggregatedData;
 }
 
-// Robust week key calculation (handles year boundaries correctly)
+
 function getWeekKey(date: Date): string {
     const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
@@ -106,19 +103,14 @@ function getWeekKey(date: Date): string {
     return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
-// Corrected: Convert ISO week string back to a date (start of the week)
 function getDateFromWeekKey(weekKey: string): Date {
     const [yearStr, weekStr] = weekKey.split('-W');
     const year = parseInt(yearStr, 10);
     const week = parseInt(weekStr, 10);
-
-    // Jan 4th is always in week 1.  Find the Thursday of that week.
     const jan4th = new Date(Date.UTC(year, 0, 4));
     const thursdayOfFirstWeek = new Date(Date.UTC(jan4th.getUTCFullYear(), 0, 4 + (4 - (jan4th.getUTCDay() ||7))));
 
-    // Calculate the start of the desired week.
     const startOfWeek = new Date(thursdayOfFirstWeek.getTime() + (week - 1) * 7 * 24 * 60 * 60 * 1000);
-    // Adjust to Monday (start of the week)
     startOfWeek.setUTCDate(startOfWeek.getUTCDate() - 3);
 
     return startOfWeek;

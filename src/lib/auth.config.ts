@@ -22,8 +22,8 @@ const authConfig: NextAuthOptions = {
       clientId: process.env.GITHUB_ID ?? '',
       clientSecret: process.env.GITHUB_SECRET ?? '',
       httpOptions: {
-        timeout: 10000, // Optional: Increase timeout if needed
-        agent: undefined, // Explicitly disable the proxy agent
+        timeout: 10000,
+        agent: undefined,
       },
     }),
     CredentialProvider({
@@ -39,22 +39,18 @@ const authConfig: NextAuthOptions = {
           throw new Error('Invalid email or password.');
         }
 
-        // Find user in MongoDB
+
         const user = await User.findOne({ email });
-        // const user = await User.findOne({ email: credentials.email });
         if (!user) {
           throw new Error('User not found.');
         }
 
-        // Validate password using bcrypt
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
           throw new Error('Invalid credentials.');
         }
 
-        // Return user data
         return {
-          // id: user._id.toString(),
           id: user._id,
           name: user.name,
           email: user.email,
@@ -65,20 +61,14 @@ const authConfig: NextAuthOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, user, account, profile }) {
-      console.log('JWT Callback:', { token, user, account, profile });
       if (user) {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
       }
-      // if (account) {
-      //   console.log("Account:", account);
-      // }
-      // console.log("Token:", token);
       return token;
     },
     async session({ session, token }) {
-      // console.log('Session Callback:', { session, token });
       if (token && token.id) {
         session.user = {
           id: token.id as string,
@@ -91,16 +81,13 @@ const authConfig: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === 'google' || account?.provider === 'github') {
         await connectMongo();
-  
-        // Check if user already exists
+
         let existingUser = await User.findOne({ email: user.email });
-  
-        // If not, create a new user
         if (!existingUser) {
           existingUser = await User.create({
             name: user.name,
             email: user.email,
-            password: null, // Google users don't have a password
+            password: null,
           });
         }
   
@@ -110,7 +97,7 @@ const authConfig: NextAuthOptions = {
     }
   },
   pages: {
-    signIn: '/' //sigin page
+    signIn: '/'
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: true

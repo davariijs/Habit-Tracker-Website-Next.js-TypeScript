@@ -216,7 +216,6 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId,onC
   />
 )}
 
-{/* For XTimesPerWeek or XTimesPerMonth */}
 {(frequencyType === 'XTimesPerWeek' || frequencyType === 'XTimesPerMonth') && (
   <FormField
     control={form.control}
@@ -240,7 +239,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId,onC
   />
 )}
 
-{/* For XTimesInXDays */}
+
 {frequencyType === 'XTimesInXDays' && (
   <>
     <FormField

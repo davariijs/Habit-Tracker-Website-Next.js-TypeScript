@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   try {
     await connectMongo();
 
-    const requestBody = await request.json(); // Get the body as JSON
+    const requestBody = await request.json();
     const result = requestSchema.safeParse(requestBody);
     if (!result.success) {
       return NextResponse.json({ message: 'Invalid request body', errors: result.error.format() }, { status: 400 });

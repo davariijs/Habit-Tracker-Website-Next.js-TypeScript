@@ -1,4 +1,3 @@
-// In your models folder, create NotificationLog.ts
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface INotificationLog extends Document {
@@ -13,7 +12,7 @@ const notificationLogSchema = new Schema({
   sentDate: { type: String, required: true },
 });
 
-// Create a compound index for efficient lookups
+
 notificationLogSchema.index({ habitId: 1, userEmail: 1, sentDate: 1 }, { unique: true });
 
 const NotificationLog = mongoose.models.NotificationLog || 

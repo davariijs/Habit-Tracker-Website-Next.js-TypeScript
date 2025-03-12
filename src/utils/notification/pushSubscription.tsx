@@ -1,12 +1,8 @@
-const VAPID_PUBLIC_KEY = "BOMxWltad74aktHYDh_E0pMxs8kH2maU0tbS4MuEwI-BM_dibL1xcu66pQ5FXD6G9v0gfgHyNBWwyyGl5hRZsQI";
-
 export const subscribeToPushNotifications = async (userEmail: string) => {
   if (!userEmail) {
     console.error("❌ Cannot subscribe: userEmail is missing");
     return;
   }
-
-  console.log("📌 Attempting push subscription for user:", userEmail);
 
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
     console.error("❌ Push notifications are not supported in this browser.");
@@ -32,7 +28,6 @@ export const subscribeToPushNotifications = async (userEmail: string) => {
     });
 
     if (response.ok) {
-      console.log("✅ Push subscription saved successfully!");
     } else {
       console.error("❌ Failed to save push subscription:", await response.json());
     }

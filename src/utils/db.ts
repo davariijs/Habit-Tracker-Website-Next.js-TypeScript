@@ -26,11 +26,10 @@ async function connectMongo() {
           bufferCommands: false,
       };
 
-      // Now we know cached exists, assign to it.
+
       if(cached){
           cached.promise = mongoose.connect(MONGO_URI, opts)
           .then((mongoose) => {
-              console.log("MongoDB connected");
               return mongoose;
           })
           .catch((error) => {
@@ -40,7 +39,7 @@ async function connectMongo() {
       }
 
   }
-  //Ensure cached is defined before proceeding
+
   if(!cached){
       throw new Error("Cached connection is undefined unexpectedly.");
   }

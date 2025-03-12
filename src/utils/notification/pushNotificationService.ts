@@ -11,11 +11,9 @@ webpush.setVapidDetails(
 
 export const clearSentNotification = async (habitId: string): Promise<void> => {
   await NotificationLog.deleteMany({ habitId });
-  console.log(`🔄 Resetting notification tracking for habit ID: ${habitId}`);
 };
 
 export const sendPushNotification = async (userEmail: string, habitId: string, title: string, message: string): Promise<void> => {
-  console.log("📌 Sending push notification to user with email:", userEmail);
 
   if (!userEmail) {
     console.error("❌ Missing userEmail in sendPushNotification!");
@@ -38,7 +36,6 @@ export const sendPushNotification = async (userEmail: string, habitId: string, t
   });
 
   if (existingLog) {
-    console.log(`⏳ Notification for ${title} (User: ${userEmail}) already sent today, skipping...`);
     return;
   }
 
@@ -46,7 +43,6 @@ export const sendPushNotification = async (userEmail: string, habitId: string, t
 
   try {
     await webpush.sendNotification(user.pushSubscription, payload);
-    console.log(`✅ Push notification for "${title}" sent successfully!`);
     
     await NotificationLog.create({
       habitId,
@@ -58,7 +54,6 @@ export const sendPushNotification = async (userEmail: string, habitId: string, t
     console.error("❌ Error sending push notification:", error);
 
     if (error instanceof webpush.WebPushError && (error.statusCode === 410 || error.statusCode === 404)) {
-      console.log(`❌ Subscription for user ${userEmail} is invalid. Marking as expired.`);
       await User.findOneAndUpdate(
         { email: userEmail },
         { $set: { "pushSubscription.expired": true } }

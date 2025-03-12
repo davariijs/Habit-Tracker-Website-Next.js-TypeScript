@@ -8,14 +8,12 @@ export default function NotificationHandler() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    // ✅ Start the notification scheduler for reminders
     fetch("/api/notification/start-scheduler", { method: "POST" });
   }, []);
 
   useEffect(() => {
     async function checkSubscription() {
       if (!session?.user?.email) {
-        console.error("❌ Cannot subscribe to push notifications: email is undefined or null");
         return;
       }
 

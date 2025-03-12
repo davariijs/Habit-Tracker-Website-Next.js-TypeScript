@@ -149,7 +149,7 @@ export default function UserRegisterForm() {
               </FormItem>
             )}
           />
-          {error && <p className="text-red-500">{error}</p>} {/* Display error message */}
+          {error && <p className="text-red-500">{error}</p>}
         <Button disabled={loading} className='ml-auto w-full' type='submit'>
         {loading ? 'Registering...' : 'Register'}
         </Button>
