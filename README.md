@@ -63,30 +63,6 @@ pnpm dev
 pnpm build
 ```
 
-## 🏗️ Architecture
-
-The application follows a modern Next.js App Router architecture with the following structure:
-
-```
-📂 src/
-  📂 app/               # Next.js App Router
-    📂 (auth)/          # Authentication routes
-    📂 api/             # API endpoints
-    📂 dashboard/       # Main dashboard pages
-  📂 components/        # Reusable UI components
-    📂 chartsProgress/  # Chart visualization components
-    📂 habits/          # Habit management components  
-    📂 layout/          # Layout components
-    📂 notification/    # Notification components
-    📂 ui/              # UI primitives
-  📂 constants/         # Constants and enums
-  📂 features/          # Feature-specific logic
-  📂 hooks/             # Custom React hooks
-  📂 lib/               # Utility libraries
-  📂 models/            # Data models (MongoDB/Mongoose)
-  📂 utils/             # Helper functions
-```
-
 ## 🧩 Key Components
 
 ### Habit Management
