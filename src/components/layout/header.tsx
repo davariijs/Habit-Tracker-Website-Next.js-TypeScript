@@ -6,6 +6,8 @@ import { UserNav } from './user-nav';
 import ThemeToggle from './ThemeToggle/theme-toggle';
 import NotificationHandler from '../notification/NotificationHandler';
 import NotificationButton from '../notification/NotificationButton';
+import ManualNotificationCheck from '../notification/ManualNotificationCheck';
+import NotificationTest from '../notification/NotificationTest';
 
 export default function Header() {
   return (
@@ -15,7 +17,9 @@ export default function Header() {
         <Separator orientation='vertical' className='mr-2 h-4' />
         <Breadcrumbs />
         <NotificationHandler/>
-        <NotificationButton/>
+        {/* <ManualNotificationCheck/> */}
+        <NotificationTest/>
+        {/* <NotificationButton/> */}
       </div>
 
       <div className='flex items-center gap-2 px-4'>

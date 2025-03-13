@@ -1,49 +1,71 @@
+// components/NotificationHandler.tsx
 "use client";
 
-import { useEffect } from "react";
-import { subscribeToPushNotifications } from "@/utils/notification/pushSubscription";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
 export default function NotificationHandler() {
   const { data: session } = useSession();
+  const [lastCheck, setLastCheck] = useState<string | null>(null);
 
   useEffect(() => {
-    async function checkSubscription() {
-      if (!session?.user?.email) {
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/get-subscription-status?email=${encodeURIComponent(session.user.email)}`);
-        const { expired } = await res.json();
-
-        if (expired) {
-          console.warn("⚠️ Subscription expired. Requesting new subscription...");
-          await subscribeToPushNotifications(session.user.email);
-        }
-      } catch (error) {
-        console.error("❌ Error checking subscription status:", error);
-      }
-    }
-
-    checkSubscription();
-  }, [session?.user?.email]);
-
-  useEffect(() => {
+    if (!session?.user?.email) return;
+    
+    // Function to check for notifications
     const checkNotifications = async () => {
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
       try {
-        await fetch("/api/notification/check-now", { method: "POST" });
-      } catch (error) {
-        console.error("Error checking notifications:", error);
+        const res = await fetch("/api/notification/check-now", { 
+          method: "POST",
+          headers: { "Cache-Control": "no-cache" },
+          signal: controller.signal // Add abort signal
+        });
+        
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status}`);
+        }
+        
+        const data = await res.json();
+        setLastCheck(new Date().toLocaleTimeString());
+        
+        if (data.sent > 0) {
+          console.log(`✅ Sent ${data.sent} notifications out of ${data.total} habits`);
+        } else {
+          console.log(`Checked ${data.total} habits, no notifications sent`);
+        }
+      } catch (error:any) {
+        if (error.name === 'AbortError') {
+          console.log("Notification check timed out");
+        } else {
+          console.error("Error checking notifications:", error);
+        }
+      } finally {
+        clearTimeout(timeoutId); // Clear timeout
       }
     };
     
-    // Check notifications immediately upon component mount
+    // Check immediately when component mounts
     checkNotifications();
     
-    // Check notifications every 5 minutes
-    const interval = setInterval(checkNotifications, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    // Then check every minute
+    const interval = setInterval(checkNotifications, 60 * 1000);
+    
+    // Also check when tab becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkNotifications();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [session?.user?.email]);
 
   return null;

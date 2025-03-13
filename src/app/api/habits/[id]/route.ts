@@ -2,12 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectMongo from '@/utils/db';
 import HabitModel, { IHabit } from '@/models/Habit';
 import mongoose from 'mongoose';
-import { scheduleNotifications } from '@/utils/notification/notificationScheduler';
 import { clearSentNotification } from "@/utils/notification/pushNotificationService"; 
-import schedule from "node-schedule";
+// Remove the schedule import
 
-
-export async function PUT(request: NextRequest,  { params }: { params: Promise<{ id: string }> }) { 
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) { 
   try {
     await connectMongo();
     const habitId = (await params).id;
@@ -22,10 +20,10 @@ export async function PUT(request: NextRequest,  { params }: { params: Promise<{
       return NextResponse.json({ message: "Habit not found" }, { status: 404 });
     }
 
-    if (schedule.scheduledJobs[habitId]) {
-      schedule.scheduledJobs[habitId].cancel();
-    }
-
+    // Remove this block - node-schedule won't work in Vercel
+    // if (schedule.scheduledJobs[habitId]) {
+    //   schedule.scheduledJobs[habitId].cancel();
+    // }
 
     const updatedHabit = await HabitModel.findByIdAndUpdate(habitId, updatedData, {
       new: true,
@@ -36,9 +34,11 @@ export async function PUT(request: NextRequest,  { params }: { params: Promise<{
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
 
+    // Still clear sent notification logs - this is still useful
     clearSentNotification(habitId);
 
-    await scheduleNotifications();
+    // This doesn't actually schedule anything anymore, but keeping for compatibility
+    // await scheduleNotifications();
 
     return NextResponse.json({ habit: updatedHabit }, { status: 200 });
   } catch (error) {
