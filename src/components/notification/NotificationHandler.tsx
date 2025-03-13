@@ -59,6 +59,22 @@ export default function NotificationHandler() {
         checkNotifications();
       }
     };
+
+    // Check if subscription is expired
+  const checkSubscriptionStatus = async () => {
+    try {
+      const res = await fetch(`/api/get-subscription-status?email=${encodeURIComponent(session.user.email ?? '')}`);
+      const { hasSubscription, expired } = await res.json();
+      
+      if (hasSubscription && expired) {
+        console.log("Subscription is expired, needs renewal");
+      }
+    } catch (error) {
+      console.error("Error checking subscription status:", error);
+    }
+  };
+  
+  checkSubscriptionStatus();
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
     

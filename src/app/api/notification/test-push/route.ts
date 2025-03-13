@@ -6,7 +6,6 @@ import webpush from "web-push";
 
 export async function POST(req: Request) {
   try {
-    console.log("Test notification endpoint called");
     await connectMongo();
     
     const { email } = await req.json();
@@ -15,14 +14,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Email is required" }, { status: 400 });
     }
     
-    console.log("Setting VAPID details");
     webpush.setVapidDetails(
       process.env.VAPID_SUBJECT as string,
       process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string,
       process.env.VAPID_PRIVATE_KEY as string
     );
     
-    console.log("Finding user:", email);
+    // Find user with subscription
     const user = await User.findOne({ email });
     
     if (!user) {
@@ -39,30 +37,57 @@ export async function POST(req: Request) {
       );
     }
     
-    console.log("User found with subscription:", user.pushSubscription);
+    // Check if subscription is already marked as expired
+    if (user.pushSubscription.expired) {
+      return NextResponse.json(
+        { success: false, error: "Push subscription is expired", expired: true }, 
+        { status: 410 }
+      );
+    }
     
     // Send a test notification
-    const payload = JSON.stringify({
-      title: "Test Notification",
-      body: "This is a test notification from your habit tracker!"
-    });
-    
-    console.log("Sending notification with payload:", payload);
-    const result = await webpush.sendNotification(user.pushSubscription, payload);
-    
-    console.log("Notification sent with result:", result.statusCode);
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: "Test notification sent successfully",
-      statusCode: result.statusCode
-    });
+    try {
+      const payload = JSON.stringify({
+        title: "Test Notification",
+        body: "This is a test notification from your habit tracker!",
+        timestamp: new Date().toISOString()
+      });
+      
+      const result = await webpush.sendNotification(user.pushSubscription, payload);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: "Test notification sent successfully",
+        statusCode: result.statusCode
+      });
+    } catch (error: any) {
+      console.error("Error sending test notification:", error);
+      
+      // Handle expired subscription
+      if (error.statusCode === 410 || error.statusCode === 404) {
+        await User.findOneAndUpdate(
+          { email },
+          { $set: { "pushSubscription.expired": true } }
+        );
+        
+        return NextResponse.json(
+          { success: false, error: "Subscription expired", expired: true }, 
+          { status: 410 }
+        );
+      }
+      
+      // Other errors
+      return NextResponse.json({ 
+        success: false, 
+        error: error.message,
+        statusCode: error.statusCode || 500
+      }, { status: error.statusCode || 500 });
+    }
   } catch (error: any) {
-    console.error("Error sending test notification:", error);
+    console.error("Error handling test notification:", error);
     return NextResponse.json({ 
       success: false, 
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      error: error.message
     }, { status: 500 });
   }
 }
