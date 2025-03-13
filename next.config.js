@@ -4,9 +4,9 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development' && !process.env.TEST_PWA,
-  sw: '/sw-custom.js',
-  publicExcludes: ['!sw-custom.js', '!workbox-*.js'],
-  buildExcludes: [/chunks\/.*$/]
+  buildExcludes: [/chunks\/.*$/],
+  sw: 'sw-custom.js',  // Remove the leading slash
+  publicExcludes: ['!sw-custom.js']
 });
 
 /** @type {import('next').NextConfig} */
