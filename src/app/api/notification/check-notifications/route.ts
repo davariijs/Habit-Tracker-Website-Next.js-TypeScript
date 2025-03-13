@@ -41,7 +41,7 @@ export async function GET() {
         }
       }
       
-      // Check if it's time to send a notification (allow 5 minute window)
+      //Check if it's time to send a notification (allow 5 minute window)
       if (habitHour === currentHour && Math.abs(habitMinute - currentMinute) <= 5) {
         return sendPushNotification(userEmail, habitId, name, question);
       }
