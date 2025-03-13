@@ -17,12 +17,12 @@ const authConfig: NextAuthOptions = {
           response_type: 'code'
         }
       }
-        }),
+    }),
     GithubProvider({
       clientId: process.env.GITHUB_ID ?? '',
       clientSecret: process.env.GITHUB_SECRET ?? '',
       httpOptions: {
-        timeout: 10000,
+        timeout: 5000,  // Reduced from 10000 to 5000
         agent: undefined,
       },
     }),
@@ -33,28 +33,38 @@ const authConfig: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials, req) {
-        await connectMongo();
-        const { email, password } = credentials ?? {};
-        if (!email || !password) {
-          throw new Error('Invalid email or password.');
+        try {
+          await connectMongo();
+          const { email, password } = credentials ?? {};
+          if (!email || !password) {
+            throw new Error('Invalid email or password.');
+          }
+
+          const user = await User.findOne({ email }).select('+password').lean();
+          if (!user) {
+            throw new Error('User not found.');
+          }
+
+          if (user && typeof user === 'object' && 'password' in user) {
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+          } else {
+            throw new Error('Invalid credentials.');
+          }
+
+          const isPasswordValid = await bcrypt.compare(password, user.password);
+          if (!isPasswordValid) {
+            throw new Error('Invalid credentials.');
+          }
+
+          return {
+            id: (user as { _id: string })._id.toString(),
+            name: user.name,
+            email: user.email,
+          };
+        } catch (error) {
+          console.error("Authorize error:", error);
+          throw error;
         }
-
-
-        const user = await User.findOne({ email });
-        if (!user) {
-          throw new Error('User not found.');
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-          throw new Error('Invalid credentials.');
-        }
-
-        return {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-        };
       },
     }),
   ],
@@ -79,28 +89,42 @@ const authConfig: NextAuthOptions = {
       return session;
     },
     async signIn({ user, account }) {
-      if (account?.provider === 'google' || account?.provider === 'github') {
-        await connectMongo();
-
-        let existingUser = await User.findOne({ email: user.email });
-        if (!existingUser) {
-          existingUser = await User.create({
-            name: user.name,
-            email: user.email,
-            password: null,
-          });
+      try {
+        if (account?.provider === 'google' || account?.provider === 'github') {
+          await connectMongo();
+          
+          // Use more efficient findOneAndUpdate to check and create in one operation
+          await User.findOneAndUpdate(
+            { email: user.email },
+            { 
+              $setOnInsert: {
+                name: user.name,
+                email: user.email,
+                password: null
+              }
+            },
+            { 
+              upsert: true, 
+              new: true,
+              lean: true, // Return plain JavaScript object instead of Mongoose document
+              maxTimeMS: 3000 // Set maximum operation time to 3 seconds
+            }
+          );
+          
+          return true;
         }
-  
         return true;
+      } catch (error) {
+        console.error("SignIn error:", error);
+        return false;
       }
-      return true;
     }
   },
   pages: {
     signIn: '/'
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true
-};
+  debug: process.env.NODE_ENV === 'development',
+}
 
 export default authConfig;

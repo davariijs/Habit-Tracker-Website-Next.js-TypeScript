@@ -14,7 +14,8 @@ const nextConfig = withPWA({
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'utfs.io' },
-      { protocol: 'https', hostname: 'api.slingacademy.com' }
+      { protocol: 'https', hostname: 'api.slingacademy.com' },
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' } 
     ]
   },
   transpilePackages: ['geist'],
@@ -29,7 +30,6 @@ const nextConfig = withPWA({
   async headers() {
     return [
       {
-        // Only cache static assets aggressively
         source: '/_next/static/(.*)',
         headers: [
           {
@@ -39,7 +39,6 @@ const nextConfig = withPWA({
         ],
       },
       {
-        // For API and dynamic content - use no-cache or short cache
         source: '/api/(.*)',
         headers: [
           {
@@ -49,7 +48,6 @@ const nextConfig = withPWA({
         ],
       },
       {
-        // Default for other routes - shorter cache time
         source: '/(.*)',
         headers: [
           {
@@ -58,7 +56,6 @@ const nextConfig = withPWA({
           },
         ],
       },
-      // Keep your PWA-specific headers
       {
         source: '/sw.js',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }]
