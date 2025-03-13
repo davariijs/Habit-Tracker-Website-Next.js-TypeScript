@@ -1,12 +1,21 @@
+// const path = require('path');
+// const withPWA = require('next-pwa')({
+//   dest: 'public',
+//   register: true,
+//   skipWaiting: true,
+//   disable: process.env.NODE_ENV === 'development' && !process.env.TEST_PWA,
+//   buildExcludes: [/chunks\/.*$/],
+//   sw: 'sw-custom.js',  // Remove the leading slash
+//   publicExcludes: ['!sw-custom.js']
+// });
+
 const path = require('path');
 const withPWA = require('next-pwa')({
   dest: 'public',
-  register: true,
+  register: false, // We'll register manually
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development' && !process.env.TEST_PWA,
-  buildExcludes: [/chunks\/.*$/],
-  sw: 'sw-custom.js',  // Remove the leading slash
-  publicExcludes: ['!sw-custom.js']
+  buildExcludes: [/chunks\/.*$/]
 });
 
 /** @type {import('next').NextConfig} */
