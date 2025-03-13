@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import connectMongo from "@/utils/db";
 import HabitModel from "@/models/Habit";
 import { sendPushNotification } from "@/utils/notification/pushNotificationService";
 
-export const dynamic = 'force-dynamic';
-
-export async function GET() {
+export async function POST() {
   try {
+    await connectMongo();
+    
     // Get all habits with reminder times
     const habits = await HabitModel.find({ reminderTime: { $exists: true, $ne: null } });
     
@@ -41,7 +42,7 @@ export async function GET() {
         }
       }
       
-      //Check if it's time to send a notification (allow 5 minute window)
+      // Check if it's time to send a notification (allow 5 minute window)
       if (habitHour === currentHour && Math.abs(habitMinute - currentMinute) <= 5) {
         return sendPushNotification(userEmail, habitId, name, question);
       }

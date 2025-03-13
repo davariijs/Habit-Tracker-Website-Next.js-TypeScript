@@ -8,10 +8,6 @@ export default function NotificationHandler() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    fetch("/api/notification/start-scheduler", { method: "POST" });
-  }, []);
-
-  useEffect(() => {
     async function checkSubscription() {
       if (!session?.user?.email) {
         return;
@@ -31,6 +27,23 @@ export default function NotificationHandler() {
     }
 
     checkSubscription();
+  }, [session?.user?.email]);
+
+  useEffect(() => {
+    const checkNotifications = async () => {
+      try {
+        await fetch("/api/notification/check-now", { method: "POST" });
+      } catch (error) {
+        console.error("Error checking notifications:", error);
+      }
+    };
+    
+    // Check notifications immediately upon component mount
+    checkNotifications();
+    
+    // Check notifications every 5 minutes
+    const interval = setInterval(checkNotifications, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, [session?.user?.email]);
 
   return null;
