@@ -4,12 +4,17 @@ import HabitModel, { IHabit } from '@/models/Habit';
 import mongoose from 'mongoose';
 import { clearSentNotification } from "@/utils/notification/pushNotificationService"; 
 import { convertToUtc, formatTime }from '@/utils/notification/time';
+interface HabitUpdateWithTimezoneOffset extends Partial<IHabit> {
+  userTimezoneOffset: number;
+}
+
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) { 
   try {
     await connectMongo();
     const habitId = (await params).id;
-    const updatedData: Partial<IHabit> = await request.json();
+    const requestData: HabitUpdateWithTimezoneOffset = await request.json();
+    const { userTimezoneOffset, ...updatedData } = requestData;
 
     if (!habitId) {
       return NextResponse.json({ message: 'Missing habit ID' }, { status: 400 });
@@ -20,11 +25,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ message: "Habit not found" }, { status: 404 });
     }
 
+    console.log("Received timezone offset:", userTimezoneOffset);
+    console.log("Before conversion:", updatedData.reminderTime);
+
     // Convert reminderTime to UTC before saving
     if (updatedData.reminderTime) {
       const userTimezoneOffset = new Date().getTimezoneOffset();
       updatedData.reminderTime = convertToUtc(updatedData.reminderTime, userTimezoneOffset);
     }
+    console.log("After conversion:", updatedData.reminderTime);
 
     const updatedHabit = await HabitModel.findByIdAndUpdate(habitId, updatedData, {
       new: true,

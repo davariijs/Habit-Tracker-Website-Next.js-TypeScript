@@ -5,8 +5,11 @@ const NotificationChecker = () => {
   useEffect(() => {
     const interval = setInterval(async () => {
       console.log("Checking for notifications...");
-      await fetch("/api/notification/check-now");
-    }, 60000); // Check every 60 seconds
+      await fetch("/api/notification/check-now", {
+        method: "POST",
+        headers: { "Cache-Control": "no-cache" }
+      });
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);

@@ -4,6 +4,10 @@ import HabitModel, { IHabit } from '@/models/Habit';
 import { isSameDay } from 'date-fns';
 import { scheduleNotifications } from '@/utils/notification/notificationScheduler';
 import { convertToUtc } from '@/utils/notification/time';
+interface HabitWithTimezoneOffset extends Omit<IHabit, '_id'> {
+  userTimezoneOffset: number;
+}
+
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,16 +33,19 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await connectMongo();
-    const habitData: Omit<IHabit, '_id'> = await request.json();
+    const requestData: HabitWithTimezoneOffset = await request.json();
+    const { userTimezoneOffset, ...habitData } = requestData;
 
     if (!habitData.userId || !habitData.name || !habitData.color || !habitData.question || !habitData.frequencyType || !habitData.reminderTime) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    // Convert reminder time to UTC before saving
-    const userTimezoneOffset = new Date().getTimezoneOffset();
+    console.log("Received timezone offset:", userTimezoneOffset);
+    console.log("Before conversion:", habitData.reminderTime);
     habitData.reminderTime = convertToUtc(habitData.reminderTime, userTimezoneOffset);
+    console.log("After conversion:", habitData.reminderTime);
 
+    
     const newHabit = new HabitModel(habitData);
     await newHabit.save();
 
