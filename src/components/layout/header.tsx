@@ -20,8 +20,10 @@ export default function Header() {
         <NotificationChecker/>
       </div>
 
-      <div className='flex items-center gap-2 px-4'>
+      <div className='flex items-center gap-3 px-4'>
+        <div className='mr-3'>
         <NotificationToggle />
+        </div>
         <UserNav />
         <ThemeToggle />
       </div>
