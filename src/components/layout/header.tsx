@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
@@ -6,7 +7,7 @@ import { UserNav } from './user-nav';
 import ThemeToggle from './ThemeToggle/theme-toggle';
 import NotificationHandler from '../notification/NotificationHandler';
 import NotificationChecker from '../notification/NotificationChecker';
-import RefreshNotificationButton from '../notification/RefreshNotificationButton';
+import NotificationToggle from '../notification/NotificationToggle';
 
 export default function Header() {
   return (
@@ -17,10 +18,10 @@ export default function Header() {
         <Breadcrumbs />
         <NotificationHandler/>
         <NotificationChecker/>
-        <RefreshNotificationButton/>
       </div>
 
       <div className='flex items-center gap-2 px-4'>
+        <NotificationToggle />
         <UserNav />
         <ThemeToggle />
       </div>

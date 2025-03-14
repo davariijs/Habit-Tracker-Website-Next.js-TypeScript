@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogDescription
 } from '@/components/ui/dialog';
+import NotificationToggle from '../notification/NotificationToggle';
 
 const AllHabits: React.FC = () => {
     const [showFormDialog, setShowFormDialog] = useState(false);
