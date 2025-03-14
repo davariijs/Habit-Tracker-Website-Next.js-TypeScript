@@ -40,11 +40,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    console.log("Received timezone offset:", userTimezoneOffset);
-    console.log("Before conversion:", habitData.reminderTime);
-    habitData.reminderTime = convertToUtc(habitData.reminderTime, userTimezoneOffset);
-    console.log("After conversion:", habitData.reminderTime);
+    // Store original time and convert to UTC
+    const localReminderTime = habitData.reminderTime;
+    // Convert to UTC
+    console.log(`Converting time for habit "${habitData.name}"`);
+    console.log(`Local time: ${localReminderTime}, Offset: ${userTimezoneOffset}`);
+    const utcReminderTime = convertToUtc(localReminderTime, userTimezoneOffset);
+    console.log(`Converted UTC time: ${utcReminderTime}`);
+    // habitData.reminderTime = convertToUtc(habitData.reminderTime, userTimezoneOffset);
 
+
+    // Save both times
+    habitData.reminderTime = localReminderTime;
+    habitData.reminderTimeUtc = utcReminderTime;
     
     const newHabit = new HabitModel(habitData);
     await newHabit.save();

@@ -10,6 +10,7 @@ export interface IHabit extends Document {
   frequencyValue: number;
   frequencyValue2?: number;
   reminderTime?: string;
+  reminderTimeUtc?: string;
   startDate: Date;
   completions: { date: Date; completed: boolean }[];
 }
@@ -28,6 +29,7 @@ const HabitSchema: Schema = new Schema({
   frequencyValue: { type: Number, required: true },
   frequencyValue2: { type: Number },
   reminderTime: { type: String },
+  reminderTimeUtc: { type: String },
   startDate: { type: Date, default: Date.now },
   completions: [{
     date: { type: Date },

@@ -28,15 +28,17 @@ export async function POST() {
         const results = [];
 
         for (const habit of habits) {
-            const { reminderTime, _id, name, userEmail, question } = habit;
+            const { reminderTimeUtc , reminderTime, _id, name, userEmail, question } = habit;
             const habitId = String(_id);
 
             if (!reminderTime) continue;
 
             // ✅ Ensure reminder time is always `HH:mm`
-            const formattedReminderTime = formatTime(reminderTime);
+            // const formattedReminderTime = formatTime(reminderTime);
+            const formattedReminderTime = formatTime(habit.reminderTimeUtc || "");
 
-            console.log(`Habit "${name}" reminder time: ${formattedReminderTime}, Current UTC time: ${currentUtcTime}`);
+
+            console.log(`Habit "${name}" local time: ${habit.reminderTime}, UTC time: ${formattedReminderTime}, Current UTC time: ${currentUtcTime}`);
 
             // ✅ Exact time match (No ±5 min offset)
             if (formattedReminderTime !== currentUtcTime) {

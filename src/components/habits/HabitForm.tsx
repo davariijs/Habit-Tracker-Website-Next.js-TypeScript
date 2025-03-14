@@ -57,6 +57,7 @@ export interface HabitFormData {
   reminderTime?: string;
   startDate: Date;
   completions: { date: Date; completed: boolean }[];
+  userTimezoneOffset?:number;
 }
 
 interface HabitFormProps {
@@ -102,6 +103,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId,onC
         reminderTime: data.reminderTime,
         startDate: initialData ? initialData.startDate : new Date(),
         completions: initialData ? initialData.completions : [],
+        userTimezoneOffset: new Date().getTimezoneOffset(), 
       };
 
       onSubmit(habitData);

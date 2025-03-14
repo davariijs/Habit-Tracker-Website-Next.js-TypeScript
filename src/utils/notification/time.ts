@@ -2,21 +2,34 @@ import moment from "moment-timezone";
 
 // Convert local time to UTC (Ensures consistency)
 export const convertToUtc = (timeString: string, userTimezoneOffset: number): string => {
-    console.log(`Converting time: ${timeString} with offset: ${userTimezoneOffset}`);
+    console.log(`Converting local time ${timeString} with offset ${userTimezoneOffset}`);
     
-    // Parse the time string
+    // Parse hours and minutes
     const [hours, minutes] = timeString.split(":").map(Number);
     
-    // Create a date object with the time
-    const localTime = new Date();
-    localTime.setHours(hours, minutes, 0, 0);
-    console.log(`Local time object: ${localTime.toString()}`);
+    // Calculate total minutes
+    let totalMinutes = hours * 60 + minutes;
     
-    // Apply the user's timezone offset
-    const userTimeMs = localTime.getTime() - (userTimezoneOffset * 60000);
-    const utcTime = moment(userTimeMs).utc().format("HH:mm");
+    // Adjust for timezone offset - subtract because getTimezoneOffset returns 
+    // minutes west of UTC (positive means behind UTC)
+    totalMinutes = totalMinutes + userTimezoneOffset;
     
-    console.log(`Result UTC time: ${utcTime}`);
+    // Handle day crossing
+    if (totalMinutes < 0) {
+        totalMinutes += 24 * 60;
+    }
+    if (totalMinutes >= 24 * 60) {
+        totalMinutes -= 24 * 60;
+    }
+    
+    // Convert back to hours and minutes
+    const utcHours = Math.floor(totalMinutes / 60);
+    const utcMinutes = totalMinutes % 60;
+    
+    // Format as HH:mm
+    const utcTime = `${utcHours.toString().padStart(2, '0')}:${utcMinutes.toString().padStart(2, '0')}`;
+    
+    console.log(`Converted: ${timeString} → ${utcTime} (UTC)`);
     return utcTime;
 };
 

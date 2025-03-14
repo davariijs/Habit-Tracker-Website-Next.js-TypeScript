@@ -3,19 +3,14 @@ import { refreshPushSubscription } from '@/utils/notification/refreshSubscriptio
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-const createHabit = async (habitData: HabitFormData) => {
-  console.log("User timezone offset:", new Date().getTimezoneOffset());
-  const dataWithTimezone = {
-    ...habitData,
-    userTimezoneOffset: new Date().getTimezoneOffset()
-  };
-  
+const createHabit = async (habitData: HabitFormData & { userTimezoneOffset?: number }) => {
+  console.log("Creating habit with offset:", habitData.userTimezoneOffset);
   const response = await fetch('/api/habits', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(dataWithTimezone),
+    body: JSON.stringify(habitData),
   });
   if (!response.ok) {
     throw new Error('Failed to create habit');
@@ -49,17 +44,16 @@ const deleteHabit = async (id: string) => {
 
 const updateHabit = async (id: string, habitData: HabitFormData) => {
   try {
-    const dataWithTimezone = {
-      ...habitData,
-      userTimezoneOffset: new Date().getTimezoneOffset()
-    };
       // First update the habit
       const response = await fetch(`/api/habits/${id}`, {
           method: 'PUT',
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify(dataWithTimezone),
+          body: JSON.stringify({
+            ...habitData,
+            userTimezoneOffset: new Date().getTimezoneOffset()
+          }),
       });
       
       if (!response.ok) {
