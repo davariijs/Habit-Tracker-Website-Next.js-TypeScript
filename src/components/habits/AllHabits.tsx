@@ -64,7 +64,6 @@ const AllHabits: React.FC = () => {
     };
   
     return (
-      <PageContainer scrollable={false}>
         <div className='flex flex-1 flex-col space-y-4 md:pl-10 pl-0'>
           <div className='flex items-start justify-between'>
             <div>
@@ -115,7 +114,6 @@ const AllHabits: React.FC = () => {
           
           <HabitList userId={userId} onEditHabit={handleEditHabit} />
         </div>
-      </PageContainer>
     );
   };
 
