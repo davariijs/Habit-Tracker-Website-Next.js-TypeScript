@@ -1,6 +1,8 @@
 // utils/notification/notificationScheduler.ts
 import HabitModel, { IHabit } from "@/models/Habit";
 import { sendPushNotification } from "./pushNotificationService";
+import { formatTime, getCurrentUtcTime } from "./time";
+import NotificationLog from "@/models/NotificationLog";
 
 // Helper function to parse reminder time (kept from original)
 export const parseReminderTime = (reminderTime: string | Date, habitName: string): { hours: number, minutes: number } | null => {
@@ -65,48 +67,67 @@ export const scheduleNotifications = async (): Promise<void> => {
 
 // Function to check if a specific habit should receive a notification now
 // This is used by the check-now API endpoint
-export const shouldSendNotificationNow = (habit: IHabit): boolean => {
-  const { reminderTime, name } = habit;
-  
+export const shouldSendNotificationNow = async (habit: IHabit): Promise<boolean> => {
+  const { reminderTime, name, _id, userEmail } = habit;
+
   if (!reminderTime) return false;
-  
-  const parsedTime = parseReminderTime(reminderTime, name);
-  if (!parsedTime) return false;
-  
-  const { hours, minutes } = parsedTime;
-  
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  
-  // Match if within a 5-minute window
-  return currentHour === hours && Math.abs(currentMinute - minutes) <= 5;
+
+  const formattedTime = formatTime(reminderTime);
+  const currentUtcTime = getCurrentUtcTime();
+
+  console.log(`📌 Checking habit "${name}" (ID: ${_id})`);
+  console.log(`💡 Stored Reminder Time (UTC): ${formattedTime}`);
+  console.log(`💡 Current Server UTC Time: ${currentUtcTime}`);
+
+  if (formattedTime === currentUtcTime) {
+      console.log(`⏰ Time matched for habit "${name}" at ${currentUtcTime}`);
+
+      // Prevent duplicate notifications
+      const today = new Date().toISOString().split("T")[0];
+      const alreadySent = await NotificationLog.findOne({
+          habitId: _id,
+          userEmail,
+          sentDate: today
+      });
+
+      if (alreadySent) {
+          console.log(`⚠️ Already sent notification for "${name}" today`);
+          return false;
+      }
+
+      return true;
+  }
+
+  console.log(`❌ Time did not match for habit "${name}"`);
+  return false;
 };
 
-// Function to manually trigger notifications for testing
-export const triggerNotificationsNow = async (habitId?: string): Promise<{ sent: number, total: number }> => {
-  let query = {};
-  
-  if (habitId) {
-    query = { _id: habitId, reminderTime: { $exists: true, $ne: null } };
-  } else {
-    query = { reminderTime: { $exists: true, $ne: null } };
-  }
-  
-  const habits = await HabitModel.find(query);
+
+// Trigger notifications manually
+export const triggerNotificationsNow = async (): Promise<{ sent: number, total: number }> => {
+  const habits = await HabitModel.find({ reminderTime: { $exists: true, $ne: null } });
   let sentCount = 0;
-  
+
   for (const habit of habits) {
-    const { _id, name, userEmail, question } = habit;
-    const id = String(_id);
-    
-    try {
-      await sendPushNotification(userEmail, id, name, question);
-      sentCount++;
-    } catch (error) {
-      console.error(`Failed to send notification for habit "${name}":`, error);
-    }
+      if (await shouldSendNotificationNow(habit)) {
+          const { _id, name, userEmail, question } = habit;
+
+          try {
+              await sendPushNotification(userEmail, String(_id), name, question);
+              sentCount++;
+
+              // Log the notification
+              await NotificationLog.create({
+                  habitId: _id,
+                  userEmail,
+                  sentDate: new Date().toISOString().split("T")[0]
+              });
+
+          } catch (error) {
+              console.error(`❌ Failed to send notification for habit "${name}":`, error);
+          }
+      }
   }
-  
+
   return { sent: sentCount, total: habits.length };
 };

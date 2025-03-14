@@ -3,6 +3,7 @@ import connectMongo from '@/utils/db';
 import HabitModel, { IHabit } from '@/models/Habit';
 import { isSameDay } from 'date-fns';
 import { scheduleNotifications } from '@/utils/notification/notificationScheduler';
+import { convertToUtc } from '@/utils/notification/time';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,6 +16,9 @@ export async function GET(request: NextRequest) {
     }
 
     const habits = await HabitModel.find({ userId });
+    
+    console.log("📌 Retrieved Habits:", habits); // Log stored habits
+
     return NextResponse.json({ habits }, { status: 200 });
   } catch (error) {
     console.error(error);
@@ -27,13 +31,16 @@ export async function POST(request: NextRequest) {
     await connectMongo();
     const habitData: Omit<IHabit, '_id'> = await request.json();
 
-    if (!habitData.userId || !habitData.name || !habitData.color || !habitData.question || !habitData.frequencyType) {
+    if (!habitData.userId || !habitData.name || !habitData.color || !habitData.question || !habitData.frequencyType || !habitData.reminderTime) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
+    // Convert reminder time to UTC before saving
+    const userTimezoneOffset = new Date().getTimezoneOffset();
+    habitData.reminderTime = convertToUtc(habitData.reminderTime, userTimezoneOffset);
+
     const newHabit = new HabitModel(habitData);
     await newHabit.save();
-    await scheduleNotifications();
 
     return NextResponse.json({ habit: newHabit }, { status: 201 });
   } catch (error) {

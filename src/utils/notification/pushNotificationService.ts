@@ -9,56 +9,51 @@ webpush.setVapidDetails(
 );
 
 
-export const clearSentNotification = async (habitId: string): Promise<void> => {
-  await NotificationLog.deleteMany({ habitId });
-};
+export async function clearSentNotification(habitId: string) {
+  try {
+    console.log(`🔄 Clearing previous notification logs for habit ID: ${habitId}`);
+    const deleted = await NotificationLog.deleteMany({ habitId });
+    console.log(`✅ Cleared ${deleted.deletedCount} notification logs`);
+    return deleted;
+  } catch (error) {
+    console.error(`❌ Error clearing notification logs: ${error}`);
+    throw error;
+  }
+}
 
 export const sendPushNotification = async (userEmail: string, habitId: string, title: string, message: string): Promise<void> => {
-
   if (!userEmail) {
-    console.error("❌ Missing userEmail in sendPushNotification!");
-    return;
+      console.error("❌ Missing userEmail in sendPushNotification!");
+      return;
   }
 
   const user = await User.findOne({ email: userEmail });
 
   if (!user || !user.pushSubscription || user.pushSubscription.expired) {
-    console.error(`❌ User not found or subscription invalid: ${userEmail}`);
-    return;
+      console.error(`❌ User not found or subscription invalid: ${userEmail}`);
+      return;
   }
 
   const today = new Date().toISOString().split("T")[0];
-  
+
   const existingLog = await NotificationLog.findOne({
-    habitId,
-    userEmail,
-    sentDate: today
+      habitId,
+      userEmail,
+      sentDate: today
   });
 
   if (existingLog) {
-    return;
+      return;
   }
 
   const payload = JSON.stringify({ title, body: message });
 
   try {
-    await webpush.sendNotification(user.pushSubscription, payload);
-    
-    await NotificationLog.create({
-      habitId,
-      userEmail,
-      sentDate: today
-    });
-    
-  } catch (error:any) {
-    console.error("❌ Error sending push notification:", error);
+      await webpush.sendNotification(user.pushSubscription, payload);
+      
+      await NotificationLog.create({ habitId, userEmail, sentDate: today });
 
-    if (error instanceof webpush.WebPushError && (error.statusCode === 410 || error.statusCode === 404)) {
-      await User.findOneAndUpdate(
-        { email: userEmail },
-        { $set: { "pushSubscription.expired": true } }
-      );
-      return;
-    }
+  } catch (error: any) {
+      console.error("❌ Error sending push notification:", error);
   }
 };

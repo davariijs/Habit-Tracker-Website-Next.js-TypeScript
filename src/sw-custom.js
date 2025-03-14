@@ -61,63 +61,47 @@
 
 
 // src/sw-custom.js
-self.addEventListener('install', (event) => {
-    console.log('Service Worker installing.');
-    self.skipWaiting();
-  });
+self.addEventListener('push', function(event) {
+  console.log('[Service Worker] Push Received:', event);
   
-  self.addEventListener('activate', (event) => {
-    console.log('Service Worker activating.');
-    event.waitUntil(clients.claim());
-  });
-  
-  self.addEventListener('push', (event) => {
-    console.log('Push received:', event.data?.text());
+  try {
+    const data = event.data.json();
+    console.log('[Service Worker] Push Data:', data);
     
-    if (!event.data) {
-      console.log('Push event but no data');
-      return;
-    }
+    const options = {
+      body: data.body || 'Time to track your habit!',
+      icon: '/icons/icon-192x192.png', // Add your app icon path
+      data: {
+        habitId: data.habitId,
+        url: `/habits/${data.habitId}`
+      }
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  } catch (err) {
+    console.error('[Service Worker] Error processing push:', err);
     
-    try {
-      const data = event.data.json();
-      
-      const options = {
-        body: data.body || 'Reminder for your habit',
-        icon: '/icons/icon-192x192.png',
-        badge: '/icons/icon-72x72.png',
-        data: {
-          timestamp: data.timestamp || new Date().toISOString(),
-          url: data.url || '/'
-        },
-        vibrate: [100, 50, 100],
-        actions: [
-          {
-            action: 'view',
-            title: 'Open App'
-          }
-        ]
-      };
-      
-      event.waitUntil(
-        self.registration.showNotification(data.title || 'Habit Reminder', options)
-      );
-    } catch (error) {
-      console.error('Error showing notification:', error);
-    }
-  });
+    // Fallback notification if data parsing fails
+    event.waitUntil(
+      self.registration.showNotification('Habit Reminder', {
+        body: 'Time to check your habits!'
+      })
+    );
+  }
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', function(event) {
+  console.log('[Service Worker] Notification click received:', event);
   
-  self.addEventListener('notificationclick', (event) => {
-    console.log('Notification clicked:', event.notification.tag);
-    event.notification.close();
-    
-    if (event.action === 'view' || !event.action) {
-      const urlToOpen = event.notification.data?.url || '/';
-        
-      event.waitUntil(
-        clients.openWindow(urlToOpen)
-      );
-    }
-  });
+  event.notification.close();
   
-  console.log('Service Worker loaded successfully!');
+  // Open the app and navigate to the specific habit if possible
+  const habitUrl = event.notification.data?.url || '/';
+  
+  event.waitUntil(
+    clients.openWindow(habitUrl)
+  );
+});

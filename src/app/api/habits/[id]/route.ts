@@ -3,7 +3,7 @@ import connectMongo from '@/utils/db';
 import HabitModel, { IHabit } from '@/models/Habit';
 import mongoose from 'mongoose';
 import { clearSentNotification } from "@/utils/notification/pushNotificationService"; 
-// Remove the schedule import
+import { convertToUtc, formatTime }from '@/utils/notification/time';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) { 
   try {
@@ -20,10 +20,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ message: "Habit not found" }, { status: 404 });
     }
 
-    // Remove this block - node-schedule won't work in Vercel
-    // if (schedule.scheduledJobs[habitId]) {
-    //   schedule.scheduledJobs[habitId].cancel();
-    // }
+    // Convert reminderTime to UTC before saving
+    if (updatedData.reminderTime) {
+      const userTimezoneOffset = new Date().getTimezoneOffset();
+      updatedData.reminderTime = convertToUtc(updatedData.reminderTime, userTimezoneOffset);
+    }
 
     const updatedHabit = await HabitModel.findByIdAndUpdate(habitId, updatedData, {
       new: true,
@@ -34,11 +35,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
 
-    // Still clear sent notification logs - this is still useful
-    clearSentNotification(habitId);
-
-    // This doesn't actually schedule anything anymore, but keeping for compatibility
-    // await scheduleNotifications();
+    // 🛑 Clear old notification logs so a fresh notification can be sent
+    await clearSentNotification(habitId);
 
     return NextResponse.json({ habit: updatedHabit }, { status: 200 });
   } catch (error) {

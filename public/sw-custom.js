@@ -1,44 +1,47 @@
 // public/sw-custom.js
-// Simple service worker for push notifications only
+// public/sw.js (or wherever your service worker is located)
 
-self.addEventListener('install', event => {
-  self.skipWaiting();
-  console.log('Service Worker installed');
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(clients.claim());
-  console.log('Service Worker activated');
-});
-
-// Handle push notifications sent from the server
-self.addEventListener('push', event => {
-  if (!event.data) return;
+self.addEventListener('push', function(event) {
+  console.log('[Service Worker] Push Received:', event);
   
   try {
     const data = event.data.json();
+    console.log('[Service Worker] Push Data:', data);
     
     const options = {
-      body: data.body || 'Time to check your habit!',
-      icon: '/icons/icon-192x192.png',
-      tag: data.habitId || 'general',
-      data: { url: '/' },
-      vibrate: [100, 50, 100]
+      body: data.body || 'Time to track your habit!',
+      icon: '/icons/icon-192x192.png', // Add your app icon path
+      data: {
+        habitId: data.habitId,
+        url: `/habits/${data.habitId}`
+      }
     };
-    
+
     event.waitUntil(
-      self.registration.showNotification(data.title || 'Habit Reminder', options)
+      self.registration.showNotification(data.title, options)
     );
-  } catch (error) {
-    console.error('Error showing notification:', error);
+  } catch (err) {
+    console.error('[Service Worker] Error processing push:', err);
+    
+    // Fallback notification if data parsing fails
+    event.waitUntil(
+      self.registration.showNotification('Habit Reminder', {
+        body: 'Time to check your habits!'
+      })
+    );
   }
 });
 
 // Handle notification clicks
-self.addEventListener('notificationclick', event => {
+self.addEventListener('notificationclick', function(event) {
+  console.log('[Service Worker] Notification click received:', event);
+  
   event.notification.close();
   
+  // Open the app and navigate to the specific habit if possible
+  const habitUrl = event.notification.data?.url || '/';
+  
   event.waitUntil(
-    clients.openWindow('/')
+    clients.openWindow(habitUrl)
   );
 });
