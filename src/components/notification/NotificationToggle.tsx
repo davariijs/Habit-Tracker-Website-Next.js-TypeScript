@@ -1,10 +1,9 @@
 'use client'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSession } from "next-auth/react";
-import { Switch, FormControlLabel } from '@mui/material';
+import { Switch, FormControlLabel, IconButton, Tooltip } from '@mui/material';
+import { Notifications as NotificationsIcon, NotificationsOff as NotificationsOffIcon, Block as BlockIcon, NotificationsActive } from '@mui/icons-material'; // Import Material-UI icons
 import { toast } from 'sonner';
-import { useRef } from 'react';
-
 
 const NotificationToggle = () => {
     const [isEnabled, setIsEnabled] = useState(false);
@@ -30,12 +29,11 @@ const NotificationToggle = () => {
         return outputArray;
     }
 
-    // Check subscription status and update state
     const checkSubscriptionStatus = async () => {
         if ('serviceWorker' in navigator && 'Notification' in window) {
             const registration = await navigator.serviceWorker.getRegistration('/sw-custom.js');
             const currentPermission = Notification.permission;
-            setPermission(currentPermission); // Update permission
+            setPermission(currentPermission);
 
             if (registration) {
                 const subscription = await registration.pushManager.getSubscription();
@@ -49,7 +47,6 @@ const NotificationToggle = () => {
         }
     };
 
-    // Initial permission check (runs only once)
     useEffect(() => {
         const checkInitialPermission = async () => {
             if ('Notification' in window) {
@@ -58,13 +55,11 @@ const NotificationToggle = () => {
                     toastShown.current = true;
                 }
             }
-            // Check subscription status after initial permission check
             await checkSubscriptionStatus();
         };
         checkInitialPermission();
     }, []);
 
-    // Check subscription when userEmail changes
     useEffect(() => {
         setEmail(userEmail);
         checkSubscriptionStatus();
@@ -74,17 +69,16 @@ const NotificationToggle = () => {
         const newValue = event.target.checked;
         setIsEnabled(newValue);
         localStorage.setItem('notificationsEnabled', String(newValue));
-
         if (newValue) {
             await subscribeUserToPush();
         } else {
             await unsubscribeUserFromPush();
         }
-        // Re-check status after toggle, in case permission changed
         await checkSubscriptionStatus();
     };
 
     const subscribeUserToPush = async () => {
+        // ... (rest of your subscribeUserToPush remains unchanged) ...
         if (!('serviceWorker' in navigator) || !('Notification' in window)) {
             console.error('Service workers or Notifications are not supported.');
             return;
@@ -99,10 +93,9 @@ const NotificationToggle = () => {
             const publicKeyResponse = await fetch("/api/notification/vapid-public-key");
             const { publicKey } = await publicKeyResponse.json();
 
-            // Request permission and handle the result
             if (Notification.permission !== 'granted') {
                  const newPermission = await Notification.requestPermission();
-                    setPermission(newPermission); // Update permission state IMMEDIATELY
+                    setPermission(newPermission);
 
                 if (newPermission !== 'granted') {
                     console.warn('Notification permission was not granted.');
@@ -112,7 +105,7 @@ const NotificationToggle = () => {
                         toast.error('Notification permission was not granted.');
                         toastShown.current = true;
                     }
-                    return; // Exit if permission is not granted
+                    return;
                 }
             }
 
@@ -144,25 +137,40 @@ const NotificationToggle = () => {
     };
 
     const unsubscribeUserFromPush = async () => {
-      if ('serviceWorker' in navigator) {
-          try {
-            const registration = await navigator.serviceWorker.getRegistration('/sw-custom.js');
-            if (registration) {
-              const subscription = await registration.pushManager.getSubscription();
-              if (subscription) {
-                await subscription.unsubscribe();
-                console.log('User is unsubscribed:', subscription);
+        // ... (rest of your unsubscribeUserFromPush remains unchanged) ...
+        if ('serviceWorker' in navigator) {
+            try {
+              const registration = await navigator.serviceWorker.getRegistration('/sw-custom.js');
+              if (registration) {
+                const subscription = await registration.pushManager.getSubscription();
+                if (subscription) {
+                  await subscription.unsubscribe();
+                  console.log('User is unsubscribed:', subscription);
+                }
+                  await registration.unregister();
+                  console.log('Service worker unregistered.');
+                  setPermission('default');
+                  setIsSubscribed(false);
               }
-                await registration.unregister();
-                console.log('Service worker unregistered.');
-                setPermission('default');
-                setIsSubscribed(false);
+            } catch (error) {
+              console.error('Error during unsubscription:', error);
             }
-          } catch (error) {
-            console.error('Error during unsubscription:', error);
           }
+    };
+
+    // Determine which icon to display
+    const getNotificationIcon = () => {
+        if (permission === 'denied') {
+            return <Tooltip title="Notifications blocked"><NotificationsOffIcon color="disabled" /></Tooltip>;
+        } else if (isSubscribed && isEnabled) {
+            return <Tooltip title="Notifications active"><NotificationsActive color="primary" /></Tooltip>
+        }else if (isEnabled) {
+            return <Tooltip title="Notifications enabled"><NotificationsIcon color="primary" /></Tooltip>;
         }
-  };
+        else {
+            return <Tooltip title="Notifications disabled"><NotificationsOffIcon color="disabled" /></Tooltip>;
+        }
+    };
 
     return (
         <div>
@@ -173,9 +181,11 @@ const NotificationToggle = () => {
                         onChange={handleToggle}
                         color="primary"
                         disabled={permission === 'denied'}
+                        sx={{ display: 'none' }} // Hide the switch itself
                     />
                 }
-                label="Notifications"
+                label={getNotificationIcon()} // Use the icon as the label
+                labelPlacement="start" // Place the icon to the left of any other label content (we have none)
             />
         </div>
     );
