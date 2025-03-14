@@ -30,10 +30,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     // Convert reminderTime to UTC before saving
     if (updatedData.reminderTime) {
-      const userTimezoneOffset = new Date().getTimezoneOffset();
-      updatedData.reminderTime = convertToUtc(updatedData.reminderTime, userTimezoneOffset);
+      console.log(`Converting time for habit update "${existingHabit.name}"`);
+      console.log(`Local time: ${updatedData.reminderTime}, Offset: ${userTimezoneOffset}`);
+      
+      // Store original time
+      const localReminderTime = updatedData.reminderTime;
+      
+      // Convert to UTC
+      const utcReminderTime = convertToUtc(localReminderTime, userTimezoneOffset);
+      console.log(`Converted UTC time: ${utcReminderTime}`);
+      
+      // Save both times
+      updatedData.reminderTime = localReminderTime;
+      updatedData.reminderTimeUtc = utcReminderTime;
     }
-    console.log("After conversion:", updatedData.reminderTime);
 
     const updatedHabit = await HabitModel.findByIdAndUpdate(habitId, updatedData, {
       new: true,

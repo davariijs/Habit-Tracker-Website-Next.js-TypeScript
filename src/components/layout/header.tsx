@@ -5,7 +5,6 @@ import { Breadcrumbs } from '../breadcrumbs';
 import { UserNav } from './user-nav';
 import ThemeToggle from './ThemeToggle/theme-toggle';
 import NotificationHandler from '../notification/NotificationHandler';
-import NotificationTest from '../notification/NotificationTest';
 import NotificationChecker from '../notification/NotificationChecker';
 import RefreshNotificationButton from '../notification/RefreshNotificationButton';
 
@@ -18,7 +17,6 @@ export default function Header() {
         <Breadcrumbs />
         <NotificationHandler/>
         <NotificationChecker/>
-        {/* <NotificationTest/> */}
         <RefreshNotificationButton/>
       </div>
 
