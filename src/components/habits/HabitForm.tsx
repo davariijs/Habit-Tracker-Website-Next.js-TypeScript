@@ -41,7 +41,7 @@ const habitFormSchema = z.object({
   ]),
   frequencyValue: z.coerce.number().int().positive().optional(),
   frequencyValue2: z.coerce.number().int().positive().optional(),
-  reminderTime: z.string().optional(),
+  reminderTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: 'Invalid time format' }),
 });
 
 type HabitFormValues = z.infer<typeof habitFormSchema>;
@@ -54,7 +54,7 @@ export interface HabitFormData {
   frequencyType: IHabit['frequencyType'];
   frequencyValue: number;
   frequencyValue2?: number;
-  reminderTime?: string;
+  reminderTime: string;
   startDate: Date;
   completions: { date: Date; completed: boolean }[];
   userTimezoneOffset?:number;
@@ -84,7 +84,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId,onC
       frequencyType: initialData?.frequencyType || 'everyday',
       frequencyValue: initialData?.frequencyValue || 1,
       frequencyValue2: initialData?.frequencyValue2 || 1,
-      reminderTime: initialData?.reminderTime || '',
+      reminderTime: initialData?.reminderTime || '19:00',
     },
   });
   const frequencyType = form.watch('frequencyType');
@@ -112,11 +112,6 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSubmit, initialData, userId,onC
   const getTextColor = () => {
     return theme === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)';
   };
-
-  const getMenuItemTextColor = () => {
-    return theme === 'dark' ? '#fff' : '#000';
-};
-
 
 
   return (
