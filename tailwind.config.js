@@ -108,7 +108,7 @@ module.exports = {
       },
       // --- Add Custom Font Size Here ---
       fontSize: {
-        xxs: '8px', // Define the custom 'xxs' size
+        xxs: '10px', // Define the custom 'xxs' size
         ...require('tailwindcss/defaultTheme').fontSize, // Include default font sizes
       },
     }
