@@ -81,7 +81,6 @@ import Script from 'next/script';
 export const metadata: Metadata = {
   title: 'Habit Tracker',
   description: 'Habit Tracker application',
-  // Add other metadata here as needed (e.g., open graph tags)
 };
 
 const lato = Lato({
@@ -99,8 +98,8 @@ export default async function RootLayout({
   return (
     <html lang='en' className={`${lato.className}`} suppressHydrationWarning>
       <head>
-        {/* --- IMPORTANT: Viewport Meta Tag --- */}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        {/* --- Enable User Scaling --- */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0e1111" />
@@ -111,31 +110,15 @@ export default async function RootLayout({
               window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/sw-custom.js')
                   .then(reg => {
-                    // Registration was successful, you can optionally log it
                     console.log('ServiceWorker registration successful with scope: ', reg.scope);
-
-                    // Check if the app can be installed (optional)
-                    window.addEventListener('beforeinstallprompt', (e) => {
-                      // Prevent the mini-infobar from appearing on mobile
-                      e.preventDefault();
-                      // Stash the event so it can be triggered later.
-                      // deferredPrompt = e;  // You'd need to declare deferredPrompt
-                      // Show the install button or other UI element
-                      // showInstallButton(); // Your custom function to show the install button
-                    });
                   })
                   .catch(err => console.error("❌ Service Worker registration failed:", err));
-              });
-
-              // Log when installation is available (optional)
-              window.addEventListener('appinstalled', (event) => {
-                console.log('App was installed');
               });
             }
           `}
         </Script>
       </head>
-      <body className={'overflow-hidden'}> 
+      <body className='min-h-screen'> {/* Remove overflow-hidden, add min-h-screen */}
         <NextTopLoader showSpinner={false} />
         <NuqsAdapter>
           <Providers session={session}>
