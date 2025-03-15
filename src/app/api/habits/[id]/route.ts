@@ -28,19 +28,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     console.log("Received timezone offset:", userTimezoneOffset);
     console.log("Before conversion:", updatedData.reminderTime);
 
-    // Convert reminderTime to UTC before saving
+
     if (updatedData.reminderTime) {
       console.log(`Converting time for habit update "${existingHabit.name}"`);
       console.log(`Local time: ${updatedData.reminderTime}, Offset: ${userTimezoneOffset}`);
       
-      // Store original time
       const localReminderTime = updatedData.reminderTime;
       
-      // Convert to UTC
       const utcReminderTime = convertToUtc(localReminderTime, userTimezoneOffset);
       console.log(`Converted UTC time: ${utcReminderTime}`);
       
-      // Save both times
       updatedData.reminderTime = localReminderTime;
       updatedData.reminderTimeUtc = utcReminderTime;
     }
@@ -53,8 +50,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (!updatedHabit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
-
-    // 🛑 Clear old notification logs so a fresh notification can be sent
     await clearSentNotification(habitId);
 
     return NextResponse.json({ habit: updatedHabit }, { status: 200 });
