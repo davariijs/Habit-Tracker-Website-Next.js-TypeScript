@@ -105,7 +105,12 @@ module.exports = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         rainbow: 'rainbow var(--speed, 2s) infinite linear'
-      }
+      },
+      // --- Add Custom Font Size Here ---
+      fontSize: {
+        xxs: '8px', // Define the custom 'xxs' size
+        ...require('tailwindcss/defaultTheme').fontSize, // Include default font sizes
+      },
     }
   },
   plugins: [require('tailwindcss-animate')]
