@@ -8,7 +8,6 @@ import useSWR from 'swr';
 import { HabitFormData } from './HabitForm';
 import { useSession } from 'next-auth/react';
 import { IHabit } from '@/models/Habit';
-import PageContainer from '../layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -77,7 +76,7 @@ const AllHabits: React.FC = () => {
               <Box>
                 <Button
                   variant='default' 
-                  size='lg'
+                  size='sm'
                   onClick={() => {
                     setEditingHabit(null);
                     setShowFormDialog(true);
