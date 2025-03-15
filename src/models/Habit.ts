@@ -9,7 +9,7 @@ export interface IHabit extends Document {
   frequencyType: 'everyday' | 'everyXDays' | 'XTimesPerWeek' | 'XTimesPerMonth' | 'XTimesInXDays';
   frequencyValue: number;
   frequencyValue2?: number;
-  reminderTime?: string;
+  reminderTime: string;
   reminderTimeUtc?: string;
   startDate: Date;
   completions: { date: Date; completed: boolean }[];
