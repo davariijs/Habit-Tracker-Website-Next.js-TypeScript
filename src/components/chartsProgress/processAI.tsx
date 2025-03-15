@@ -47,12 +47,12 @@ const ProcessAI: React.FC<HabitTitleProps> = ({ habitId, range }) => {
 
 
   return (
-    <Card className="p-6">
-      <h2 className="text-lg font-semibold">AI Goal & Habit Improvement</h2>
+    <Card className="p-6 flex flex-col justify-center items-center">
+      <h2 className="sm:text-lg text-sm font-semibold">AI Goal & Habit Improvement</h2>
       <button
         onClick={handleGenerateSuggestion}
         disabled={loading}
-        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded sm:text-base text-sm"
       >
         {loading ? "Generating..." : "Get AI Suggestion"}
       </button>
@@ -66,8 +66,9 @@ const FormattedSuggestion: React.FC<{ text: string }> = ({ text }) => {
     const sections = text.split("\n").filter((line) => line.trim() !== "");
 
     return (
-      <div className="mt-6 bg-gray-50 p-4 rounded-lg border">
-        <h3 className="text-lg font-semibold text-gray-700">🧠 AI Suggestions</h3>
+      <Card className="border-0">
+        <div className="mt-6  p-4 ">
+        <h3 className="text-lg font-semibold ">🧠 AI Suggestions</h3>
         <div className="mt-2 space-y-3">
           {sections.map((line, index) => {
             if (line.startsWith("**") && line.includes(":** ")) {
@@ -79,7 +80,7 @@ const FormattedSuggestion: React.FC<{ text: string }> = ({ text }) => {
                   <h4 className="text-md font-bold text-blue-600 mt-4">
                     {headingText}
                   </h4>
-                  {paragraphText && <p className="text-gray-700">{paragraphText}</p>}
+                  {paragraphText && <p className="">{paragraphText}</p>}
                 </div>
               );
             } else if (/^\*\*.*\*\*$/.test(line)) {
@@ -90,16 +91,17 @@ const FormattedSuggestion: React.FC<{ text: string }> = ({ text }) => {
               );
             } else if (/^\*/.test(line) || /^-/.test(line)) {
               return (
-                <li key={index} className="list-disc list-inside text-gray-700">
+                <li key={index} className="list-disc list-inside ">
                   {line.replace(/^\* |^- /, "")}
                 </li>
               );
             } else {
-              return <p key={index} className="text-gray-700">{line}</p>;
+              return <p key={index} className="">{line}</p>;
             }
           })}
         </div>
       </div>
+      </Card>
     );
   };
 
