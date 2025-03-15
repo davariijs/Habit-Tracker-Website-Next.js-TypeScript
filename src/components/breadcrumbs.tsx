@@ -22,20 +22,20 @@ export function Breadcrumbs() {
           <Fragment key={item.title}>
             {/* Desktop View (hidden on small screens) */}
             {index !== items.length - 1 && (
-              <BreadcrumbItem className='hidden md:block'>
+              <BreadcrumbItem className='hidden sm:block'>
                 <BreadcrumbLink href={item.link}>{item.title}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
             {index < items.length - 1 && (
-              <BreadcrumbSeparator className='hidden md:block'>
+              <BreadcrumbSeparator className='hidden sm:block'>
                 <Slash />
               </BreadcrumbSeparator>
             )}
 
             {/* Mobile View (only show last two items) */}
             {(index >= items.length - 2) && (
-              <BreadcrumbItem className='md:hidden'>
-                <BreadcrumbLink href={item.link} className="text-sm"> {/* Smaller font */}
+              <BreadcrumbItem className='sm:hidden'>
+                <BreadcrumbLink href={item.link} className="text-xxs"> {/* Smaller font */}
                   {item.title}
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -43,14 +43,14 @@ export function Breadcrumbs() {
 
              {/* Mobile Separator (only show between last two) */}
             {(index === items.length - 2) && (
-                <BreadcrumbSeparator className='md:hidden'>
-                    <Slash className="size-3"/> {/* potentially smaller slash */}
+                <BreadcrumbSeparator className='sm:hidden'>
+                    <Slash className="size-2"/> {/* potentially smaller slash */}
                 </BreadcrumbSeparator>
             )}
 
             {/*  Always show the last item (current page) */}
              {index === items.length - 1 && (
-              <BreadcrumbPage className='hidden md:block'>{item.title}</BreadcrumbPage> //desktop
+              <BreadcrumbPage className='hidden sm:block'>{item.title}</BreadcrumbPage> //desktop
             )}
           </Fragment>
         ))}
