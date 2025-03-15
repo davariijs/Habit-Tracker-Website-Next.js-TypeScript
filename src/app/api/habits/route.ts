@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     const habits = await HabitModel.find({ userId });
     
-    console.log("📌 Retrieved Habits:", habits); // Log stored habits
+    console.log("📌 Retrieved Habits:", habits); 
 
     return NextResponse.json({ habits }, { status: 200 });
   } catch (error) {
@@ -40,17 +40,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    // Store original time and convert to UTC
+
     const localReminderTime = habitData.reminderTime;
-    // Convert to UTC
     console.log(`Converting time for habit "${habitData.name}"`);
     console.log(`Local time: ${localReminderTime}, Offset: ${userTimezoneOffset}`);
     const utcReminderTime = convertToUtc(localReminderTime, userTimezoneOffset);
     console.log(`Converted UTC time: ${utcReminderTime}`);
-    // habitData.reminderTime = convertToUtc(habitData.reminderTime, userTimezoneOffset);
 
-
-    // Save both times
     habitData.reminderTime = localReminderTime;
     habitData.reminderTimeUtc = utcReminderTime;
     
